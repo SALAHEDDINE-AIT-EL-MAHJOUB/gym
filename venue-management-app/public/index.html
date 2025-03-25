@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Salle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnX9zBVZN4_VhfP-bbswmZRfUeUUiCKEE",
+            authDomain: "user-5bb45.firebaseapp.com",
+            databaseURL: "https://user-5bb45-default-rtdb.firebaseio.com",
+            projectId: "user-5bb45",
+            storageBucket: "user-5bb45.firebasestorage.app",
+            messagingSenderId: "423023307371",
+            appId: "1:423023307371:web:cd440caca5991972ab5f2e"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // State to store the global tariff
+        let globalTariff = 0;
+
+        // Function to set the global tariff
+        window.setGlobalTariff = function() {
+            const tariff = parseFloat(prompt("Enter the monthly global tariff:"));
+            if (!isNaN(tariff) && tariff > 0) {
+                globalTariff = tariff;
+                alert(`Global tariff set to ${globalTariff}`);
+            } else {
+                alert("Invalid tariff amount. Please enter a valid number greater than 0.");
+            }
+        };
+
+        // Function to add a new client to Firebase
+        window.addClient = function() {
+            const cin = document.getElementById('cin').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const paymentDate = document.getElementById('paymentDate').value; // For initial payment
+
+            if (cin && phoneNumber && firstName && lastName) {
+                const clientsRef = ref(db, 'clients');
+                const newClient = {
+                    cin: cin,
+                    phoneNumber: phoneNumber,
+                    firstName: firstName,
+                    lastName: lastName,
+                    paymentFrequency: "monthly" // Default payment frequency
+                };
+                if (paymentDate) {
+                    newClient.payments = [{ date: paymentDate, amount: globalTariff }];
+                }
+                push(clientsRef, newClient)
+                .then(() => {
+                    // Clear the form
+                    document.getElementById('cin').value = '';
+                    document.getElementById('phoneNumber').value = '';
+                    document.getElementById('firstName').value = '';
+                    document.getElementById('lastName').value = '';
+                    document.getElementById('paymentDate').value = '';
+                    console.log('Client added successfully!');
+                })
+                .catch((error) => {
+                    console.error('Error adding client:', error);
+                });
+            } else {
+                alert('Please fill in all fields.');
+            }
+        };
+
+        // Function to open the add payment modal
+        window.openAddPaymentModal = function(clientId) {
+            const modal = document.getElementById('addPaymentModal');
+            modal.style.display = 'block';
+            modal.dataset.clientId = clientId; // Store the client ID in the modal
+
+            // Set the default payment date to one month after the last payment
+            const clientRef = ref(db, `clients/${clientId}`);
+            get(clientRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const client = snapshot.val();
+                    const payments = client.payments || [];
+                    const paymentFrequency = client.paymentFrequency || "monthly";
+
+                    let nextValidPaymentDate;
+
+                    if (payments.length > 0) {
+                        const lastPayment = payments[payments.length - 1];
+                        const lastPaymentDate = new Date(lastPayment.date);
+
+                        nextValidPaymentDate = new Date(lastPaymentDate);
+                        if (paymentFrequency === "monthly") {
+                            nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
+                        } else if (paymentFrequency === "annual") {
+                            nextValidPaymentDate.setFullYear(nextValidPaymentDate.getFullYear() + 1);
+                        }
+                    } else {
+                        // If no payments exist, set the next payment date to one month from today
+                        nextValidPaymentDate = new Date();
+                        nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
+                    }
+
+                    // Format the date as YYYY-MM-DD for the input field
+                    const year = nextValidPaymentDate.getFullYear();
+                    const month = String(nextValidPaymentDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(nextValidPaymentDate.getDate()).padStart(2, '0');
+                    const formattedDate = `${year}-${month}-${day}`;
+
+                    document.getElementById('newPaymentDate').value = formattedDate;
+                }
+            });
+        };
+
+        // Function to close the add payment modal
+        window.closeAddPaymentModal = function() {
+            const modal = document.getElementById('addPaymentModal');
+            modal.style.display = 'none';
+        };
+
+        // Function to add a payment
+        window.addPayment = function() {
+            const clientId = document.getElementById('addPaymentModal').dataset.clientId;
+            const newPaymentDate = document.getElementById('newPaymentDate').value;
+            const paymentAmountInput = document.getElementById('paymentAmount').value;
+            const paymentAmount = parseFloat(paymentAmountInput);
+
+            if (isNaN(paymentAmount) || paymentAmount <= 0) {
+                document.getElementById('paymentError').textContent = "Invalid payment amount. Please enter a valid number greater than 0.";
+                return;
+            } else {
+                document.getElementById('paymentError').textContent = ""; // Clear any previous error
+            }
+
+            const clientRef = ref(db, `clients/${clientId}`);
+            get(clientRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const client = snapshot.val();
+                    const payments = client.payments || [];
+                    const paymentFrequency = client.paymentFrequency || "monthly"; // Default to monthly if not set
+
+                    // Get the last payment date
+                    const lastPayment = payments[payments.length - 1];
+                    const lastPaymentDate = new Date(lastPayment.date);
+
+                    // Calculate the next valid payment date
+                    let nextValidPaymentDate = new Date(lastPaymentDate);
+                    if (paymentFrequency === "monthly") {
+                        nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
+                    } else if (paymentFrequency === "annual") {
+                        nextValidPaymentDate.setFullYear(nextValidPaymentDate.getFullYear() + 1);
+                    }
+
+                    const newPaymentDateObj = new Date(newPaymentDate);
+
+                    if (newPaymentDateObj < nextValidPaymentDate) {
+                        document.getElementById('paymentError').textContent = `Payment date must be on or after ${nextValidPaymentDate.toLocaleDateString()}`;
+                        return;
+                    } else {
+                        document.getElementById('paymentError').textContent = "";
+                    }
+
+                    const paymentType = (paymentFrequency === "monthly") ? "monthly" : "annual";
+                    let calculatedPaymentAmount = (paymentType === "monthly") ? globalTariff : globalTariff * 12;
+
+                    if (paymentAmount < calculatedPaymentAmount) {
+                        document.getElementById('paymentError').textContent = `Payment amount cannot be less than ${calculatedPaymentAmount} for ${paymentType} payment.`;
+                        return;
+                    } else {
+                        document.getElementById('paymentError').textContent = "";
+                    }
+
+                    payments.push({ date: newPaymentDate, amount: paymentAmount });
+
+                    // Update the client with the new payment
+                    update(clientRef, { payments: payments })
+                        .then(() => {
+                            console.log('Payment added successfully!');
+                            closeAddPaymentModal(); // Close the modal on success
+                        })
+                        .catch((error) => console.error('Error adding payment:', error));
+                } else {
+                    console.log("No data available");
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        };
+
+        // Function to open the edit client modal
+        window.openEditClientModal = function(clientId) {
+            const modal = document.getElementById('editClientModal');
+            modal.style.display = 'block';
+            modal.dataset.clientId = clientId;
+
+            // Populate the form with the client's data
+            const clientRef = ref(db, `clients/${clientId}`);
+            get(clientRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const client = snapshot.val();
+                    document.getElementById('editCin').value = client.cin || '';
+                    document.getElementById('editPhoneNumber').value = client.phoneNumber || '';
+                    document.getElementById('editFirstName').value = client.firstName || '';
+                    document.getElementById('editLastName').value = client.lastName || '';
+                }
+            });
+        };
+
+        // Function to close the edit client modal
+        window.closeEditClientModal = function() {
+            const modal = document.getElementById('editClientModal');
+            modal.style.display = 'none';
+        };
+
+        // Function to handle editing a client
+        window.editClient = function() {
+            const clientId = document.getElementById('editClientModal').dataset.clientId;
+            const cin = document.getElementById('editCin').value;
+            const phoneNumber = document.getElementById('editPhoneNumber').value;
+            const firstName = document.getElementById('editFirstName').value;
+            const lastName = document.getElementById('editLastName').value;
+
+            // Update the client
+            const clientRef = ref(db, `clients/${clientId}`);
+            update(clientRef, {
+                cin: cin,
+                phoneNumber: phoneNumber,
+                firstName: firstName,
+                lastName: lastName
+            })
+            .then(() => {
+                console.log('Client updated successfully!');
+                closeEditClientModal();
+            })
+            .catch((error) => console.error('Error updating client:', error));
+        };
+
+        // Function to delete a client
+        window.deleteClient = function() {
+            const clientId = document.getElementById('editClientModal').dataset.clientId;
+            const deleteConfirmation = prompt("Enter 123 to permanently delete this client.");
+
+            if (deleteConfirmation === "123") {
+                const clientRef = ref(db, `clients/${clientId}`);
+                remove(clientRef)
+                    .then(() => {
+                        console.log('Client deleted successfully!');
+                        closeEditClientModal();
+                    })
+                    .catch((error) => console.error('Error deleting client:', error));
+            } else {
+                alert("Deletion cancelled.");
+            }
+        };
+
+        // Function to close the payment history modal
+        window.closePaymentHistoryModal = function() {
+            const modal = document.getElementById('paymentHistoryModal');
+            modal.style.display = 'none';
+        };
+
+        // Function to show payments (opens the modal)
+        window.showPayments = function(clientId) {
+            console.log("showPayments called with clientId:", clientId);
+            openPaymentHistoryModal(clientId);
+        };
+
+        // Function to open the payment history modal
+        window.openPaymentHistoryModal = function(clientId) {
+            console.log("openPaymentHistoryModal called with clientId:", clientId);
+            const modal = document.getElementById('paymentHistoryModal');
+            modal.style.display = 'block';
+            modal.dataset.clientId = clientId;
+
+            // Populate the payment history
+            const clientRef = ref(db, `clients/${clientId}`);
+            const paymentList = document.getElementById('paymentList');
+
+            get(clientRef).then((snapshot) => {
+                console.log("Snapshot exists:", snapshot.exists());
+                if (snapshot.exists()) {
+                    const client = snapshot.val();
+                    console.log("Client data:", client);
+                    const payments = client.payments || [];
+                    console.log("Payments array:", payments);
+
+                    let paymentTable = `
+                        <table style="width:100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color:#f2f2f2;">
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date</th>
+                                    <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    payments.forEach(payment => {
+                        paymentTable += `
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">${payment.date}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">${payment.amount}</td>
+                                </tr>
+                        `;
+                    });
+
+                    paymentTable += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    paymentList.innerHTML = paymentTable;
+                    console.log("Generated payment table HTML:", paymentTable);
+                } else {
+                    console.log("No data available");
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        };
+
+        // Function to display clients in a table
+        function displayClients(clients) {
+            const clientsTable = document.getElementById('clientsTable');
+            clientsTable.innerHTML = `
+                <thead>
+                    <tr style="background-color:#f2f2f2;">
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">CIN</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Phone</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">First Name</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Last Name</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Next Payment Due</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `; // Clear existing table and add header
+
+            const tbody = clientsTable.querySelector('tbody');
+
+            for (const key in clients) {
+                if (clients.hasOwnProperty(key)) {
+                    const client = clients[key];
+                    const row = document.createElement('tr');
+
+                    // Calculate the next payment due date
+                    const payments = client.payments || [];
+                    const paymentFrequency = client.paymentFrequency || "monthly";
+                    let nextPaymentDueDate = null;
+
+                    if (payments.length > 0) {
+                        const lastPayment = payments[payments.length - 1];
+                        const lastPaymentDate = new Date(lastPayment.date);
+
+                        nextPaymentDueDate = new Date(lastPaymentDate);
+                        if (paymentFrequency === "monthly") {
+                            nextPaymentDueDate.setMonth(nextPaymentDueDate.getMonth() + 1);
+                        } else if (paymentFrequency === "annual") {
+                            nextPaymentDueDate.setFullYear(nextPaymentDueDate.getFullYear() + 1);
+                        }
+                    } else {
+                        // If no payments exist, set the next payment date to one month from today
+                        nextPaymentDueDate = new Date();
+                        nextPaymentDueDate.setMonth(nextPaymentDueDate.getMonth() + 1);
+                    }
+
+                    // Format the date
+                    const formattedDueDate = nextPaymentDueDate.toLocaleDateString();
+
+                    // Check if the due date is within 7 days
+                    const now = new Date();
+                    const timeDiff = nextPaymentDueDate.getTime() - now.getTime();
+                    const daysUntilDue = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+                    let dueDateStyle = "";
+                    if (daysUntilDue <= 7) {
+                        dueDateStyle = "color: red;";
+                    }
+
+                    row.innerHTML = `
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">${client.cin}</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">${client.phoneNumber}</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">${client.firstName}</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">${client.lastName}</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd; ${dueDateStyle}">${formattedDueDate}</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #ddd;">
+                            <i class="fas fa-plus-circle add-payment-icon" onclick="openAddPaymentModal('${key}')"></i>
+                            <i class="fas fa-edit edit-icon" onclick="openEditClientModal('${key}')"></i>
+                            <button style="background-color: #4CAF50; color: white; padding: 5px 10px; border: none; cursor: pointer; border-radius: 3px;" onclick="showPayments('${key}')">Payments</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            }
+        }
+        // Function to delete a client after confirmation
+        window.confirmDeleteClient = function() {
+            const clientId = document.getElementById('editClientModal').dataset.clientId;
+            const deleteConfirmation = prompt("Enter 123 to permanently delete this client.");
+
+            if (deleteConfirmation === "123") {
+                const clientRef = ref(db, `clients/${clientId}`);
+                remove(clientRef)
+                    .then(() => {
+                        console.log('Client deleted successfully!');
+                        closeEditClientModal();
+                    })
+                    .catch((error) => console.error('Error deleting client:', error));
+            } else {
+                alert("Deletion cancelled.");
+            }
+        };
+
+        // Function to open the opening hours modal
+        window.openOpeningHoursModal = function() {
+            const modal = document.getElementById('openingHoursModal');
+            modal.style.display = 'block';
+        };
+
+        // Function to close the opening hours modal
+        window.closeOpeningHoursModal = function() {
+            const modal = document.getElementById('openingHoursModal');
+            modal.style.display = 'none';
+        };
+
+        // Function to save opening hours
+        window.saveOpeningHours = function() {
+            const openingHoursData = {};
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+            days.forEach(day => {
+                const closed = document.getElementById(`${day}Closed`).checked;
+                const exceptionallyClosed = document.getElementById(`${day}ExceptionallyClosed`).checked;
+
+                if (exceptionallyClosed) {
+                    openingHoursData[day] = { exceptionallyClosed: true };
+                } else if (closed) {
+                    openingHoursData[day] = { closed: true };
+                }
+                 else {
+                    const openingTime = document.getElementById(`${day}OpeningTime`).value;
+                    const closingTime = document.getElementById(`${day}ClosingTime`).value;
+                    openingHoursData[day] = {
+                        openingTime: openingTime,
+                        closingTime: closingTime,
+                        closed: false,
+                        exceptionallyClosed: false
+                    };
+                }
+            });
+
+            const openingHoursRef = ref(db, 'openingHours');
+            update(openingHoursRef, openingHoursData)
+                .then(() => {
+                    alert('Opening hours set successfully!');
+                    closeOpeningHoursModal();
+                })
+                .catch((error) => console.error('Error setting opening hours:', error));
+        };
+
+        // Function to display opening hours
+        function displayOpeningHours(openingHours) {
+            const openingHoursDisplay = document.getElementById('openingHoursDisplay');
+            let displayText = "Opening Hours: ";
+            if (openingHours) {
+                const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                days.forEach(day => {
+                    const dayData = openingHours[day];
+                    if (dayData) {
+                        if (dayData.exceptionallyClosed) {
+                            displayText += `${day}: Exceptionally Closed, `;
+                        } else if (dayData.closed) {
+                            displayText += `${day}: Closed, `;
+                        }
+                         else {
+                            displayText += `${day}: ${dayData.openingTime} - ${dayData.closingTime}, `;
+                        }
+                    }
+                });
+                openingHoursDisplay.textContent = displayText.slice(0, -2); // Remove the trailing comma and space
+            } else {
+                openingHoursDisplay.textContent = 'Opening hours not set.';
+            }
+        }
+
+        // Listen for changes to the opening hours data in Firebase
+        const openingHoursRef = ref(db, 'openingHours');
+        onValue(openingHoursRef, (snapshot) => {
+            const data = snapshot.val();
+            displayOpeningHours(data);
+        });
+
+        // Listen for changes to the clients data in Firebase
+        const clientsRef = ref(db, 'clients');
+        onValue(clientsRef, (snapshot) => {
+            const data = snapshot.val();
+            displayClients(data);
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        /* General form styling */
+        form {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .add-payment-icon {
+            color: green;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 1.2em;
+        }
+
+        .edit-icon {
+            color: blue;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        #clientsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden; /* Ensures the border-radius is applied correctly */
+        }
+
+        #clientsTable th,
+        #clientsTable td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        #clientsTable th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Payment card styles */
+        #paymentCard {
+            display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        /* Specific improvements */
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Add some spacing around the main sections */
+        section {
+            margin-bottom: 30px;
+        }
+
+        /* Style the table rows for better readability */
+        #clientsTable tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        /* Opening Hours Modal Styles */
+#openingHoursModal .modal-content {
+    width: 90%;
+    max-width: 600px;
+}
+
+#openingHoursForm {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#openingHoursForm > div {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#openingHoursForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#openingHoursForm input[type="time"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#openingHoursForm input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+/* Exception Closed Style */
+.exception-closed {
+    background-color: #ffe6e6;
+    border-color: #ffb3b3;
+}
+
+/* Calendar-like Display */
+#openingHoursDisplay {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+#openingHoursDisplay span {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+}
+
+#openingHoursDisplay .closed {
+    background-color: #ffb3b3;
+}
+    </style>
+</head>
+<body>
+    <h1>Gestion de Salle</h1>
+
+    <section>
+        <h2>Admin Panel</h2>
+        <button onclick="setGlobalTariff()">Set Global Tariff</button>
+        <button onclick="openOpeningHoursModal()">Set Opening Hours</button>
+        <p id="openingHoursDisplay"></p>
+    </section>
+
+    <section>
+        <h2>Add Client</h2>
+        <form id="addClientForm">
+            <div>
+                <label for="cin">CIN:</label>
+                <input type="text" id="cin" required>
+            </div>
+            <div>
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="tel" id="phoneNumber" required>
+            </div>
+            <div>
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" required>
+            </div>
+            <div>
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" required>
+            </div>
+            <div>
+                <label for="paymentDate">Initial Payment Date:</label>
+                <input type="date" id="paymentDate">
+            </div>
+            <button type="button" onclick="addClient()">Add Client</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Client List</h2>
+        <table id="clientsTable"></table>
+    </section>
+
+    <!-- Add Payment Modal -->
+    <div id="addPaymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddPaymentModal()">&times;</span>
+            <h2>Add Payment</h2>
+            <div>
+                <label for="newPaymentDate">Payment Date:</label>
+                <input type="date" id="newPaymentDate">
+            </div>
+            <div>
+                <label for="paymentAmount">Payment Amount:</label>
+                <input type="number" id="paymentAmount">
+            </div>
+            <p id="paymentError" style="color: red;"></p>
+            <button onclick="addPayment()">Add Payment</button>
+        </div>
+    </div>
+
+    <!-- Edit Client Modal -->
+    <div id="editClientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditClientModal()">&times;</span>
+            <h2>Edit Client</h2>
+            <div>
+                <label for="editCin">CIN:</label>
+                <input type="text" id="editCin">
+            </div>
+            <div>
+                <label for="editPhoneNumber">Phone Number:</label>
+                <input type="tel" id="editPhoneNumber">
+            </div>
+            <div>
+                <label for="editFirstName">First Name:</label>
+                <input type="text" id="editFirstName">
+            </div>
+            <div>
+                <label for="editLastName">Last Name:</label>
+                <input type="text" id="editLastName">
+            </div>
+            <button onclick="editClient()">Save Changes</button>
+            <button onclick="confirmDeleteClient()">Delete Profile</button>
+        </div>
+    </div>
+
+    <!-- Payment History Modal -->
+    <div id="paymentHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePaymentHistoryModal()">&times;</span>
+            <h2>Payment History</h2>
+            <div id="paymentList"></div>
+        </div>
+    </div>
+
+    <!-- Opening Hours Modal -->
+    <div id="openingHoursModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOpeningHoursModal()">&times;</span>
+            <h2>Set Opening Hours</h2>
+            <div id="openingHoursForm">
+                <div>
+                    <label>Monday:</label>
+                    <input type="time" id="MondayOpeningTime">
+                    <input type="time" id="MondayClosingTime">
+                    <label for="MondayClosed">Closed</label>
+                    <input type="checkbox" id="MondayClosed">
+                     <label for="MondayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="MondayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Tuesday:</label>
+                    <input type="time" id="TuesdayOpeningTime">
+                    <input type="time" id="TuesdayClosingTime">
+                    <label for="TuesdayClosed">Closed</label>
+                    <input type="checkbox" id="TuesdayClosed">
+                     <label for="TuesdayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="TuesdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Wednesday:</label>
+                    <input type="time" id="WednesdayOpeningTime">
+                    <input type="time" id="WednesdayClosingTime">
+                    <label for="WednesdayClosed">Closed</label>
+                    <input type="checkbox" id="WednesdayClosed">
+                     <label for="WednesdayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="WednesdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Thursday:</label>
+                    <input type="time" id="ThursdayOpeningTime">
+                    <input type="time" id="ThursdayClosingTime">
+                    <label for="ThursdayClosed">Closed</label>
+                    <input type="checkbox" id="ThursdayClosed">
+                     <label for="ThursdayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="ThursdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Friday:</label>
+                    <input type="time" id="FridayOpeningTime">
+                    <input type="time" id="FridayClosingTime">
+                    <label for="FridayClosed">Closed</label>
+                    <input type="checkbox" id="FridayClosed">
+                     <label for="FridayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="FridayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Saturday:</label>
+                    <input type="time" id="SaturdayOpeningTime">
+                    <input type="time" id="SaturdayClosingTime">
+                    <label for="SaturdayClosed">Closed</label>
+                    <input type="checkbox" id="SaturdayClosed">
+                     <label for="SaturdayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="SaturdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Sunday:</label>
+                    <input type="time" id="SundayOpeningTime">
+                    <input type="time" id="SundayClosingTime">
+                    <label for="SundayClosed">Closed</label>
+                    <input type="checkbox" id="SundayClosed">
+                     <label for="SundayExceptionallyClosed">Exceptionally Closed</label>
+                    <input type="checkbox" id="SundayExceptionallyClosed">
+                </div>
+            </div>
+            <button onclick="saveOpeningHours()">Save Opening Hours</button>
+        </div>
+    </div>
+</body>
+</html>
