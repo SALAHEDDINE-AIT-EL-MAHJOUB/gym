@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title data-i18n="title">Espace Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Mobile-First Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #loginForm,
+        #clientInfo,
+        #paymentHistory,
+        #calendarView {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #loginForm label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #loginForm input[type="text"],
+        #loginForm input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        #loginForm button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        #loginForm button:hover {
+            background-color: #2980b9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        /* Calendar Styles */
+        #calendar {
+            width: 100%;
+            table-layout: fixed; /* Add this line */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #calendar th,
+        #calendar td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            word-wrap: break-word; /* Add this line */
+            font-size: 0.8em; /* Reduce font size */
+        }
+
+        #calendar th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        #calendar .exception-closed {
+            background-color: #ffb3b3;
+        }
+
+        /* Language Switcher */
+        #languageSwitcher {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        #languageSwitcher button {
+            background-color: transparent;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 1em;
+            color: #3498db;
+        }
+
+        #languageSwitcher button:hover {
+            color: #2980b9;
+        }
+
+        /* Larger Screen Styles (override mobile styles) */
+        @media (min-width: 768px) {
+            body {
+                padding: 40px;
+            }
+
+            #loginForm {
+                max-width: 500px;
+                margin: 20px auto;
+            }
+
+            #loginForm button {
+                width: auto;
+            }
+        }
+
+        /* RTL Support */
+        body[lang="ar"] {
+            direction: rtl;
+            font-family: Arial, sans-serif; /* Or a specific Arabic font */
+        }
+
+        body[lang="ar"] h1,
+        body[lang="ar"] h2 {
+            text-align: right;
+        }
+
+        body[lang="ar"] th,
+        body[lang="ar"] td {
+            text-align: right;
+        }
+
+        /* New Styles for Client Info */
+        body {
+            background-color: #f9f9fa
+        }
+
+        .padding {
+            padding: 3rem !important
+        }
+
+        .user-card-full {
+            overflow: hidden;
+        }
+
+        .card {
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+            box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+            border: none;
+            margin-bottom: 30px;
+            background-color: #fff;
+        }
+
+        .m-r-0 {
+            margin-right: 0px;
+        }
+
+        .m-l-0 {
+            margin-left: 0px;
+        }
+
+        .user-card-full .user-profile {
+            border-radius: 5px 0 0 5px;
+        }
+
+        .bg-c-lite-green {
+            background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
+            background: linear-gradient(to right, #ee5a6f, #f29263);
+        }
+
+        .user-profile {
+            padding: 20px 0;
+        }
+
+        .card-block {
+            padding: 1.25rem;
+        }
+
+        .m-b-25 {
+            margin-bottom: 25px;
+        }
+
+        .img-radius {
+            border-radius: 5px;
+        }
+
+        h6 {
+            font-size: 14px;
+        }
+
+        .card .card-block p {
+            line-height: 25px;
+        }
+
+        @media only screen and (min-width: 1400px){
+            p {
+                font-size: 14px;
+            }
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: relative;
+            background: #2c3e50;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            background-color: #34495e;
+        }
+
+        .nav-links li a.active {
+            background-color: #3498db;
+        }
+
+        /* Hamburger Menu Styles */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+        }
+
+        .menu-toggle span {
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 10px;
+            transition: all 0.3s linear;
+        }
+
+        /* Page Visibility */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: #2c3e50;
+                padding: 0;
+                margin: 0;
+                flex-direction: column;
+                border-radius: 0 0 8px 8px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-links li a {
+                padding: 15px;
+                display: block;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .nav-links li:last-child a {
+                border-bottom: none;
+            }
+
+            .menu-toggle.active span:first-child {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .menu-toggle.active span:last-child {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+
+            .navbar {
+                padding: 1rem 15px;
+            }
+
+            .user-profile {
+                padding: 30px 0;
+            }
+
+            .img-radius {
+                width: 150px;
+                height: 150px;
+            }
+
+            .card {
+                margin: 10px 0;
+            }
+
+            .user-card-full .user-profile {
+                border-radius: 5px 5px 0 0;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                width: 100%;
+                border-radius: 5px 5px 0 0;
+            }
+
+            .col-sm-8 {
+                width: 100%;
+            }
+
+            .card-block {
+                padding: 1rem;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .col-sm-6 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            #calendar {
+                font-size: 0.7em;
+            }
+
+            #calendar th,
+            #calendar td {
+                padding: 4px;
+            }
+
+            #paymentTable {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 15px;
+            }
+
+            #languageSwitcher {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            #languageSwitcher button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            .page {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            /* Mobile Profile Card Styles */
+            .user-card-full .row {
+                flex-direction: column;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                width: 100%;
+                border-radius: 8px 8px 0 0;
+                padding: 20px 0;
+            }
+
+            .col-sm-8 {
+                width: 100%;
+                padding: 20px 15px;
+            }
+
+            .user-profile {
+                text-align: center;
+                padding: 20px 0;
+            }
+
+            .img-radius {
+                width: 120px;
+                height: 120px;
+                margin: 0 auto 15px;
+                display: block;
+            }
+
+            .card-block {
+                padding: 1rem;
+            }
+
+            .row .col-sm-6 {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .f-w-600 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .m-b-10 {
+                margin-bottom: 15px;
+            }
+
+            .card {
+                border-radius: 8px;
+                margin: 10px;
+            }
+
+            .m-b-25 {
+                margin-bottom: 15px;
+            }
+
+            .card .card-block {
+                padding: 15px;
+            }
+
+            .user-card-full .user-profile {
+                border-radius: 8px 8px 0 0;
+            }
+        }
+
+        /* Ajuster l'espacement du contenu sur mobile */
+        @media (max-width: 480px) {
+            .card-block {
+                padding: 10px;
+            }
+
+            .padding {
+                padding: 1.5rem !important;
+            }
+
+            .f-w-600 {
+                font-size: 1.1rem;
+            }
+
+            .m-b-20 {
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Tablet Responsive Styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .card {
+                margin: 15px;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                width: 40%;
+            }
+
+            .col-sm-8 {
+                width: 60%;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) {
+            .nav-links li a:hover {
+                background-color: transparent;
+            }
+
+            button:hover {
+                transform: none;
+            }
+
+            .nav-links li a:active {
+                background-color: #34495e;
+            }
+
+            button:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="languageSwitcher">
+        <button onclick="switchLanguage('fr')">Français</button>
+        <button onclick="switchLanguage('en')">English</button>
+        <button onclick="switchLanguage('ar')">العربية</button>
+    </div>
+
+    <h1 data-i18n="title">Espace Client</h1>
+
+    <div id="loginForm">
+        <h2 data-i18n="loginTitle">Connexion</h2>
+        <label for="phoneNumber" data-i18n="phoneNumber">Numéro de Téléphone:</label>
+        <input type="tel" id="phoneNumber" required>
+        <label for="cin" data-i18n="cin">CIN:</label>
+        <input type="text" id="cin" required>
+        <button onclick="login()" data-i18n="loginButton">Se Connecter</button>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <button class="menu-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showPage('profile')" class="active">Profile</a></li>
+                <li><a href="#" onclick="showPage('calendar')">Calendrier</a></li>
+                <li><a href="#" onclick="showPage('payments')">Paiements</a></li>
+                <li><a href="#" onclick="logout()">Déconnexion</a></li>
+            </ul>
+        </nav>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="page active">
+            <div id="clientInfo">
+                <div class="page-content page-container" id="page-content">
+                    <div class="padding">
+                        <div class="row container d-flex justify-content-center">
+                            <div class="col-xl-12 col-md-12">
+                                <div class="card user-card-full">
+                                    <div class="row m-l-0 m-r-0">
+                                        <div class="col-sm-4 bg-c-lite-green user-profile">
+                                            <div class="card-block text-center text-white">
+                                                <div class="m-b-25">
+                                                    <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
+                                                </div>
+                                                <h6 class="f-w-600" id="clientName"></h6>
+                                                <p>Membre Actif</p>
+                                                <i class="fas fa-edit m-t-40"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div class="card-block">
+                                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Information</h6>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Prochain Paiement</p>
+                                                        <h6 class="text-muted f-w-400" id="nextPaymentDueDate"></h6>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Tarif Mensuel</p>
+                                                        <h6 class="text-muted f-w-400" id="clientTariff"></h6>
+                                                    </div>
+                                                </div>
+                                                <h6 class="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Statut</h6>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Jours Restants</p>
+                                                        <h6 class="text-muted f-w-400" id="daysRemaining"></h6>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">État</p>
+                                                        <h6 class="text-muted f-w-400" id="clientStatus">Actif</h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Page -->
+        <div id="calendarPage" class="page">
+            <div id="calendarView">
+                <h2 data-i18n="openingHoursTitle">Calendrier des Horaires d'Ouverture</h2>
+                <table id="calendar">
+                    <thead>
+                        <tr>
+                            <th data-i18n="monday">Lundi</th>
+                            <th data-i18n="tuesday">Mardi</th>
+                            <th data-i18n="wednesday">Mercredi</th>
+                            <th data-i18n="thursday">Jeudi</th>
+                            <th data-i18n="friday">Vendredi</th>
+                            <th data-i18n="saturday">Samedi</th>
+                            <th data-i18n="sunday">Dimanche</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="Monday"></td>
+                            <td id="Tuesday"></td>
+                            <td id="Wednesday"></td>
+                            <td id="Thursday"></td>
+                            <td id="Friday"></td>
+                            <td id="Saturday"></td>
+                            <td id="Sunday"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payments Page -->
+        <div id="paymentsPage" class="page">
+            <div id="paymentHistory">
+                <h2 data-i18n="paymentHistoryTitle">Historique des Paiements</h2>
+                <table id="paymentTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="date">Date</th>
+                            <th data-i18n="amount">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnX9zBVZN4_VhfP-bbswmZRfUeUUiCKEE",
+            authDomain: "user-5bb45.firebaseapp.com",
+            databaseURL: "https://user-5bb45-default-rtdb.firebaseio.com",
+            projectId: "user-5bb45",
+            storageBucket: "user-5bb45.firebasestorage.app",
+            messagingSenderId: "423023307371",
+            appId: "1:423023307371:web:cd440caca5991972ab5f2e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Set persistence to local (keeps the user logged in until they explicitly log out)
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log("Persistence set to local.");
+                // Check if a user is already logged in
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log(`User is logged in: ${user.email}`);
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('mainContent').style.display = 'block';
+                        showPage('profile'); // Show profile page by default
+                    } else {
+                        console.log("No user is logged in.");
+                        document.getElementById('loginForm').style.display = 'block';
+                        document.getElementById('mainContent').style.display = 'none';
+                    }
+                });
+            })
+            .catch((error) => console.error("Error setting persistence:", error));
+
+        // Translations
+        const translations = {
+            fr: {
+                title: "Espace Client",
+                loginTitle: "Connexion",
+                phoneNumber: "Numéro de Téléphone:",
+                cin: "CIN:",
+                loginButton: "Se Connecter",
+                clientInfoTitle: "Informations",
+                name: "Nom:",
+                nextPayment: "Prochain Paiement le:",
+                paymentHistoryTitle: "Historique des Paiements",
+                date: "Date",
+                amount: "Montant",
+                openingHoursTitle: "Calendrier des Horaires d'Ouverture",
+                monday: "Lundi",
+                tuesday: "Mardi",
+                wednesday: "Mercredi",
+                thursday: "Jeudi",
+                friday: "Vendredi",
+                saturday: "Samedi",
+                sunday: "Dimanche",
+                closed: "Fermé",
+                notSet: "Non Défini",
+                tariff: "Tarif:",
+                daysRemaining: "Jours Restants:"
+            },
+            en: {
+                title: "Client Area",
+                loginTitle: "Login",
+                phoneNumber: "Phone Number:",
+                cin: "CIN:",
+                loginButton: "Login",
+                clientInfoTitle: "Client Information",
+                name: "Name:",
+                nextPayment: "Next Payment Due:",
+                paymentHistoryTitle: "Payment History",
+                date: "Date",
+                amount: "Amount",
+                openingHoursTitle: "Opening Hours Calendar",
+                monday: "Monday",
+                tuesday: "Tuesday",
+                wednesday: "Wednesday",
+                thursday: "Thursday",
+                friday: "Friday",
+                saturday: "Saturday",
+                sunday: "Sunday",
+                closed: "Closed",
+                notSet: "Not Set",
+                tariff: "Tariff:",
+                daysRemaining: "Days Remaining:"
+            },
+            ar: {
+                title: "منطقة العميل",
+                loginTitle: "تسجيل الدخول",
+                phoneNumber: "رقم الهاتف:",
+                cin: "رقم التعريف الوطني:",
+                loginButton: "تسجيل الدخول",
+                clientInfoTitle: "معلومات العميل",
+                name: "اسم:",
+                nextPayment: "تاريخ الدفع التالي:",
+                paymentHistoryTitle: "سجل الدفعات",
+                date: "تاريخ",
+                amount: "كمية",
+                openingHoursTitle: "جدول مواعيد العمل",
+                monday: "الاثنين",
+                tuesday: "الثلاثاء",
+                wednesday: "الأربعاء",
+                thursday: "الخميس",
+                friday: "الجمعة",
+                saturday: "السبت",
+                sunday: "الأحد",
+                closed: "مغلق",
+                notSet: "غير محدد",
+                tariff: "التعريفة:",
+                daysRemaining: "الأيام المتبقية:"
+            }
+        };
+
+        // Function to switch language
+        window.switchLanguage = function(lang) {
+            document.documentElement.setAttribute("lang", lang);
+            translatePage(lang);
+        };
+
+        function translatePage(lang) {
+            const translation = translations[lang];
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = translation[key];
+            });
+        }
+
+        // Set default language to French
+        switchLanguage('fr');
+
+        // Login function
+        window.login = function() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const cin = document.getElementById('cin').value;
+
+            const clientsRef = ref(db, 'clients');
+            const openingHoursRef = ref(db, 'openingHours');
+
+            Promise.all([get(clientsRef), get(openingHoursRef)])
+                .then(([clientsSnapshot, openingHoursSnapshot]) => {
+                    if (clientsSnapshot.exists()) {
+                        let clientFound = null;
+                        clientsSnapshot.forEach(childSnapshot => {
+                            const client = childSnapshot.val();
+                            if (client.phoneNumber === phoneNumber && client.cin === cin) {
+                                clientFound = { ...client, key: childSnapshot.key };
+                            }
+                        });
+
+                        if (clientFound) {
+                            displayClientInfo(clientFound);
+                            displayPaymentHistory(clientFound);
+                            displayOpeningHoursCalendar(openingHoursSnapshot.val()); // Pass opening hours data
+                            document.getElementById('loginForm').style.display = 'none';
+                            document.getElementById('mainContent').style.display = 'block';
+                            showPage('profile'); // Show profile page by default
+                        } else {
+                            alert("Incorrect phone number or CIN.");
+                        }
+                    } else {
+                        console.log("No data available");
+                        alert("No client found.");
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+        };
+
+        function displayClientInfo(client) {
+            document.getElementById('clientName').textContent = `${client.firstName} ${client.lastName}`;
+
+            // Fetch the global tariff from the root level
+            const dbRef = ref(db);
+            get(dbRef)
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    const globalTariff = data.globalTariff;
+                    document.getElementById('clientTariff').textContent = `${globalTariff} MAD`;
+                })
+                .catch((error) => {
+                    console.error("Error fetching tariff:", error);
+                    document.getElementById('clientTariff').textContent = "N/A";
+                });
+
+            // Calculate and display next payment due date
+            const payments = client.payments || [];
+            const paymentFrequency = client.paymentFrequency || "monthly";
+            let nextPaymentDueDate = null;
+
+            if (payments.length > 0) {
+                const lastPayment = payments[payments.length - 1];
+                const lastPaymentDate = new Date(lastPayment.date);
+
+                nextPaymentDueDate = new Date(lastPaymentDate);
+                if (paymentFrequency === "monthly") {
+                    nextPaymentDueDate.setMonth(nextPaymentDueDate.getMonth() + 1);
+                } else if (paymentFrequency === "annual") {
+                    nextPaymentDueDate.setFullYear(nextPaymentDueDate.getFullYear() + 1);
+                }
+            } else {
+                nextPaymentDueDate = new Date();
+                nextPaymentDueDate.setMonth(nextPaymentDueDate.getMonth() + 1);
+            }
+
+            document.getElementById('nextPaymentDueDate').textContent = nextPaymentDueDate.toLocaleDateString();
+
+            // Calculate and display days remaining
+            const today = new Date();
+            const timeDiff = nextPaymentDueDate - today;
+            const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            document.getElementById('daysRemaining').textContent = daysRemaining > 0 ? daysRemaining : "0";
+        }
+
+        function displayPaymentHistory(client) {
+            const paymentTableBody = document.getElementById('paymentTable').querySelector('tbody');
+            paymentTableBody.innerHTML = ''; // Clear existing table rows
+
+            const payments = client.payments || [];
+
+            payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.date}</td>
+                    <td>${payment.amount}</td>
+                `;
+                paymentTableBody.appendChild(row);
+            });
+        }
+
+        function displayOpeningHoursCalendar(openingHours) {
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            days.forEach(day => {
+                const dayData = openingHours && openingHours[day];
+                const dayCell = document.getElementById(day);
+
+                if (dayData) {
+                    if (dayData.closed) {
+                        dayCell.textContent = translations[document.documentElement.lang].closed;
+                        dayCell.classList.add("exception-closed");
+                    } else {
+                        dayCell.textContent = `${dayData.openingTime} - ${dayData.closingTime}`;
+                        dayCell.classList.remove("exception-closed");
+                    }
+                } else {
+                    dayCell.textContent = translations[document.documentElement.lang].notSet;
+                    dayCell.classList.remove("exception-closed");
+                }
+            });
+        }
+
+        // Add new navigation function
+        window.showPage = function(pageId) {
+            // Remove active class from all pages and links
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page and highlight nav link
+            document.getElementById(pageId + 'Page').classList.add('active');
+            document.querySelector(`[onclick="showPage('${pageId}')"]`).classList.add('active');
+        };
+
+        // Update logout function
+        window.logout = function() {
+            signOut(auth).then(() => {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'none';
+                // Reset active page
+                showPage('profile');
+            }).catch((error) => console.error("Error logging out:", error));
+        };
+
+        // Fonction pour le menu hamburger
+        window.toggleMenu = function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        };
+
+        // Fermer le menu quand un lien est cliqué
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                const menuToggle = document.querySelector('.menu-toggle');
+                const navLinks = document.querySelector('.nav-links');
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
