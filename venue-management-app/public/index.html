@@ -753,6 +753,105 @@
                     });
             }
         };
+
+        // Modifier la fonction displayPrivateMessages
+        function displayPrivateMessages(messages) {
+            const tbody = document.querySelector('#privateMessagesTable tbody');
+            tbody.innerHTML = '';
+
+            if (!messages) return;
+
+            for (const [key, message] of Object.entries(messages)) {
+                const row = document.createElement('tr');
+                row.className = `private-message${message.read ? '' : ' unread'}`;
+                
+                row.innerHTML = `
+                    <td>${message.clientName}</td>
+                    <td>
+                        ${message.content}
+                        <div class="signature-display">${message.signature || message.clientName}</div>
+                    </td>
+                    <td>${new Date(message.timestamp).toLocaleString()}</td>
+                    <td>
+                        <button class="reply-button" onclick="replyToMessage('${key}')">Répondre</button>
+                        <button onclick="deletePrivateMessage('${key}')">Supprimer</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Fonction pour répondre à un message privé
+        window.replyToMessage = function(messageId) {
+            const messageRef = ref(db, `privateMessages/${messageId}`);
+            get(messageRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const message = snapshot.val();
+                    const reply = prompt(`Répondre à ${message.clientName}:\n${message.content}`);
+                    
+                    if (reply) {
+                        const clientRef = ref(db, `clients/${message.clientId}/messages`);
+                        const newMessage = {
+                            content: reply,
+                            timestamp: new Date().toISOString(),
+                            sender: 'admin',
+                            read: false
+                        };
+                        
+                        push(clientRef, newMessage)
+                            .then(() => {
+                                // Marquer le message original comme lu
+                                update(messageRef, { read: true })
+                                    .then(() => {
+                                        alert('Réponse envoyée avec succès');
+                                    })
+                                    .catch((error) => {
+                                        console.error('Erreur lors de la mise à jour du message:', error);
+                                    });
+                            })
+                            .catch((error) => {
+                                console.error('Erreur lors de l\'envoi de la réponse:', error);
+                                alert('Erreur lors de l\'envoi de la réponse');
+                            });
+                    }
+                }
+            });
+        };
+
+        // Fonction pour supprimer un message privé
+        window.deletePrivateMessage = function(messageId) {
+            if (confirm('Voulez-vous vraiment supprimer ce message ?')) {
+                remove(ref(db, `privateMessages/${messageId}`))
+                    .then(() => {
+                        alert('Message supprimé avec succès');
+                    })
+                    .catch((error) => {
+                        console.error('Erreur lors de la suppression du message:', error);
+                        alert('Erreur lors de la suppression du message');
+                    });
+            }
+        };
+
+        // Écouter les changements dans la collection des messages privés
+        onValue(ref(db, 'privateMessages'), (snapshot) => {
+            const messages = snapshot.val() || {};
+            displayPrivateMessages(messages);
+        });
+
+        // Fonction pour basculer entre les onglets de messages
+        window.switchMessageTab = function(tab) {
+            // Mettre à jour les boutons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Mettre à jour les onglets
+            document.querySelectorAll('.message-tab').forEach(tabContent => {
+                tabContent.classList.remove('active');
+            });
+            document.getElementById(tab + 'MessagesTab').classList.add('active');
+        };
     </script>
     <style>
         body {
@@ -1275,6 +1374,117 @@
         .message-important {
             background-color: #fff3f3;
         }
+
+        /* Private Messages Styles */
+        .private-messages-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .private-messages-list {
+            margin-top: 15px;
+        }
+
+        #privateMessagesTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #privateMessagesTable th,
+        #privateMessagesTable td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #privateMessagesTable th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .private-message {
+            background-color: #f8f9fa;
+        }
+
+        .private-message.unread {
+            background-color: #e3f2fd;
+        }
+
+        .reply-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .reply-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Message Tabs Styles */
+        .message-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .message-tab {
+            display: none;
+        }
+
+        .message-tab.active {
+            display: block;
+        }
+
+        /* Signature Styles */
+        .signature-display {
+            font-style: italic;
+            color: #666;
+            margin-top: 5px;
+            font-size: 0.9em;
+            padding-left: 10px;
+            border-left: 2px solid #ddd;
+        }
+
+        /* Footer Styles */
+        .footer-sidebar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(44, 62, 80, 0.7);
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .copyright {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -1397,41 +1607,71 @@
     <!-- Gestion des Messages Section -->
     <section id="messagesSection" class="page">
         <h2>Gestion des Messages</h2>
-        <div class="message-form">
-            <form id="messageForm">
-                <div class="form-group">
-                    <label for="messageTitle">Titre du Message:</label>
-                    <input type="text" id="messageTitle" required>
-                </div>
-                <div class="form-group">
-                    <label for="messageContent">Contenu:</label>
-                    <textarea id="messageContent" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="messageExpiry">Durée d'affichage (en jours):</label>
-                    <input type="number" id="messageExpiry" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="messageImportant">Message Important:</label>
-                    <input type="checkbox" id="messageImportant">
-                </div>
-                <button type="button" onclick="addMessage()">Publier le Message</button>
-            </form>
+        
+        <!-- Message Tabs -->
+        <div class="message-tabs">
+            <button class="tab-button active" onclick="switchMessageTab('private')">Messages Privés</button>
+            <button class="tab-button" onclick="switchMessageTab('public')">Messages Publics</button>
         </div>
-        <div class="messages-list">
-            <h3>Messages Actifs</h3>
-            <table id="messagesTable">
-                <thead>
-                    <tr>
-                        <th>Titre</th>
-                        <th>Contenu</th>
-                        <th>Date d'Expiration</th>
-                        <th>Important</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+
+        <!-- Messages Privés Tab -->
+        <div id="privateMessagesTab" class="message-tab active">
+            <div class="private-messages-section">
+                <div class="private-messages-list">
+                    <table id="privateMessagesTable">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Message</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Publics Tab -->
+        <div id="publicMessagesTab" class="message-tab">
+            <div class="message-form">
+                <h3>Publier un Message</h3>
+                <form id="messageForm">
+                    <div class="form-group">
+                        <label for="messageTitle">Titre du Message:</label>
+                        <input type="text" id="messageTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">Contenu:</label>
+                        <textarea id="messageContent" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageExpiry">Durée d'affichage (en jours):</label>
+                        <input type="number" id="messageExpiry" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageImportant">Message Important:</label>
+                        <input type="checkbox" id="messageImportant">
+                    </div>
+                    <button type="button" onclick="addMessage()">Publier le Message</button>
+                </form>
+            </div>
+            <div class="messages-list">
+                <h3>Messages Publics Actifs</h3>
+                <table id="messagesTable">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Contenu</th>
+                            <th>Date d'Expiration</th>
+                            <th>Important</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </section>
 
@@ -1554,6 +1794,10 @@
             </div>
             <button onclick="saveOpeningHours()">Enregistrer les Horaires</button>
         </div>
+    </div>
+
+    <div class="footer-sidebar">
+        <p class="copyright">Salah MHJ &copy; 2025</p>
     </div>
 
     <script>
