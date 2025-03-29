@@ -640,6 +640,47 @@
                 gap: 10px;
             }
         }
+
+        /* Messages Page Styles */
+        .messages-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .message-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .message-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .message-card.important {
+            border-left: 4px solid #ff4444;
+        }
+
+        .message-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .message-content {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .message-date {
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -649,7 +690,7 @@
         <button onclick="switchLanguage('ar')">العربية</button>
     </div>
 
-    <h1 data-i18n="title">Espace Client</h1>
+    
 
     <div id="loginForm">
         <h2 data-i18n="loginTitle">Connexion</h2>
@@ -670,18 +711,30 @@
             </button>
             <div class="navbar-container">
                 <ul class="nav-links">
-                    <li><a href="#profile" data-page="profile" class="active">
-                        <i class="fas fa-user"></i> Profile
-                    </a></li>
-                    <li><a href="#calendar" data-page="calendar">
-                        <i class="fas fa-calendar"></i> Calendrier
-                    </a></li>
-                    <li><a href="#payments" data-page="payments">
-                        <i class="fas fa-money-bill"></i> Paiements
-                    </a></li>
-                    <li><a href="#" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Déconnexion
-                    </a></li>
+                    <li>
+                        <a href="#profile" data-page="profile" class="active">
+                            <i class="fas fa-user"></i>
+                            <span data-i18n="nav_profile">Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#calendar" data-page="calendar">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span data-i18n="nav_calendar">Calendrier</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#messages" data-page="messages">
+                            <i class="fas fa-bell"></i>
+                            <span data-i18n="nav_messages">Messages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-i18n="nav_logout">Déconnexion</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -690,49 +743,44 @@
         <div id="profilePage" class="page active">
             <div class="profile-container">
                 <div class="profile-card">
-                    <!-- Header avec l'image et les infos principales -->
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <img src="https://img.icons8.com/bubbles/100/000000/user.png" alt="Profile" class="avatar-img">
                         </div>
                         <div class="profile-info">
                             <h2 class="profile-name" id="clientName"></h2>
-                            <span class="membership-badge" data-i18n="memberStatus">Membre Actif</span>
+                            <span class="membership-badge" data-i18n="profile_active_member">Membre Actif</span>
                         </div>
                     </div>
 
-                    <!-- Corps de la carte avec les informations détaillées -->
                     <div class="profile-body">
                         <div class="info-grid">
-                            <!-- Prochain Paiement -->
                             <div class="info-box">
                                 <div class="info-icon">
                                     <i class="fas fa-calendar"></i>
                                 </div>
                                 <div class="info-content">
-                                    <h3 data-i18n="nextPaymentTitle">Prochain Paiement</h3>
+                                    <h3 data-i18n="profile_payment_due">Prochain Paiement</h3>
                                     <p id="nextPaymentDueDate"></p>
                                 </div>
                             </div>
 
-                            <!-- Tarif -->
                             <div class="info-box">
                                 <div class="info-icon">
                                     <i class="fas fa-money-bill"></i>
                                 </div>
                                 <div class="info-content">
-                                    <h3 data-i18n="monthlyRate">Tarif Mensuel</h3>
+                                    <h3 data-i18n="profile_monthly_tariff">Tarif Mensuel</h3>
                                     <p id="clientTariff"></p>
                                 </div>
                             </div>
 
-                            <!-- Jours Restants -->
                             <div class="info-box">
                                 <div class="info-icon">
                                     <i class="fas fa-hourglass-half"></i>
                                 </div>
                                 <div class="info-content">
-                                    <h3 data-i18n="daysRemainingTitle">Jours Restants</h3>
+                                    <h3 data-i18n="profile_remaining_days">Jours Restants</h3>
                                     <p id="daysRemaining"></p>
                                 </div>
                             </div>
@@ -786,20 +834,11 @@
             </div>
         </div>
 
-        <!-- Payments Page -->
-        <div id="paymentsPage" class="page">
-            <div id="paymentHistory">
-                <h2 data-i18n="paymentHistoryTitle">Historique des Paiements</h2>
-                <table id="paymentTable">
-                    <thead>
-                        <tr>
-                            <th data-i18n="date">Date</th>
-                            <th data-i18n="amount">Montant</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
+        <!-- Messages Page -->
+        <div id="messagesPage" class="page">
+            <div class="messages-container">
+                <h2 data-i18n="messages_title">Messages</h2>
+                <div id="messagesList" data-loading-text="loading_messages" data-empty-text="no_messages"></div>
             </div>
         </div>
     </div>
@@ -880,11 +919,21 @@
                 notSet: "Non Défini",
                 tariff: "Tarif:",
                 daysRemaining: "Jours Restants:",
-                memberStatus: "Membre Actif",
-                nextPaymentTitle: "Prochain Paiement",
-                monthlyRate: "Tarif Mensuel",
-                daysRemainingTitle: "Jours Restants",
-                mad: "MAD"
+                nav_profile: "Profile",
+                nav_calendar: "Calendrier",
+                nav_messages: "Messages",
+                nav_logout: "Déconnexion",
+                messages_title: "Messages",
+                no_messages: "Aucun message pour le moment",
+                loading_messages: "Chargement des messages...",
+                error_loading_messages: "Erreur lors du chargement des messages.",
+                profile_active_member: "Membre Actif",
+                profile_next_payment: "Prochain Paiement",
+                profile_monthly_fee: "Tarif Mensuel",
+                profile_days_remaining: "Jours Restants",
+                profile_payment_due: "Prochain Paiement le",
+                profile_monthly_tariff: "Tarif Mensuel",
+                profile_remaining_days: "Jours Restants"
             },
             en: {
                 title: "Client Area",
@@ -910,11 +959,21 @@
                 notSet: "Not Set",
                 tariff: "Tariff:",
                 daysRemaining: "Days Remaining:",
-                memberStatus: "Active Member",
-                nextPaymentTitle: "Next Payment",
-                monthlyRate: "Monthly Rate",
-                daysRemainingTitle: "Days Remaining",
-                mad: "MAD"
+                nav_profile: "Profile",
+                nav_calendar: "Calendar",
+                nav_messages: "Messages",
+                nav_logout: "Logout",
+                messages_title: "Messages",
+                no_messages: "No messages at the moment",
+                loading_messages: "Loading messages...",
+                error_loading_messages: "Error loading messages.",
+                profile_active_member: "Active Member",
+                profile_next_payment: "Next Payment",
+                profile_monthly_fee: "Monthly Fee",
+                profile_days_remaining: "Days Remaining",
+                profile_payment_due: "Next Payment Due",
+                profile_monthly_tariff: "Monthly Tariff",
+                profile_remaining_days: "Remaining Days"
             },
             ar: {
                 title: "منطقة العميل",
@@ -940,11 +999,21 @@
                 notSet: "غير محدد",
                 tariff: "التعريفة:",
                 daysRemaining: "الأيام المتبقية:",
-                memberStatus: "عضو نشط",
-                nextPaymentTitle: "الدفعة القادمة",
-                monthlyRate: "التعريفة الشهرية",
-                daysRemainingTitle: "الأيام المتبقية",
-                mad: "درهم"
+                nav_profile: "الملف الشخصي",
+                nav_calendar: "التقويم",
+                nav_messages: "الرسائل",
+                nav_logout: "تسجيل الخروج",
+                messages_title: "الرسائل",
+                no_messages: "لا توجد رسائل حاليا",
+                loading_messages: "جاري تحميل الرسائل...",
+                error_loading_messages: "خطأ أثناء تحميل الرسائل.",
+                profile_active_member: "عضو نشط",
+                profile_next_payment: "الدفعة القادمة",
+                profile_monthly_fee: "الرسوم الشهرية",
+                profile_days_remaining: "الأيام المتبقية",
+                profile_payment_due: "موعد الدفع القادم",
+                profile_monthly_tariff: "التعريفة الشهرية",
+                profile_remaining_days: "الأيام المتبقية"
             }
         };
 
@@ -952,22 +1021,6 @@
         window.switchLanguage = function(lang) {
             document.documentElement.setAttribute("lang", lang);
             translatePage(lang);
-            
-            // Mettre à jour le format des dates si l'utilisateur est connecté
-            if (document.getElementById('mainContent').style.display !== 'none') {
-                const nextPaymentDate = new Date(document.getElementById('nextPaymentDueDate').textContent);
-                const options = { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                };
-                document.getElementById('nextPaymentDueDate').textContent = 
-                    nextPaymentDate.toLocaleDateString(lang, options);
-                    
-                // Mettre à jour l'unité monétaire
-                const tariff = document.getElementById('clientTariff').textContent.split(' ')[0];
-                document.getElementById('clientTariff').textContent = `${tariff} ${translations[lang].mad}`;
-            }
         };
 
         function translatePage(lang) {
@@ -1065,11 +1118,11 @@
                 if (clientFound) {
                     // Success - show main content
                     displayClientInfo(clientFound);
-                    displayPaymentHistory(clientFound);
                     displayOpeningHoursCalendar(openingHoursSnapshot.val());
+                    displayClientMessages();
                     document.getElementById('loginForm').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
-                    window.showPage('profile'); // Utiliser window.showPage
+                    window.showPage('profile');
                 } else {
                     alert("Invalid credentials");
                 }
@@ -1088,8 +1141,7 @@
                 .then((snapshot) => {
                     const data = snapshot.val();
                     const globalTariff = data.globalTariff;
-                    const currentLang = document.documentElement.lang;
-                    document.getElementById('clientTariff').textContent = `${globalTariff} ${translations[currentLang].mad}`;
+                    document.getElementById('clientTariff').textContent = `${globalTariff} MAD`;
                 })
                 .catch((error) => {
                     console.error("Error fetching tariff:", error);
@@ -1116,36 +1168,13 @@
                 nextPaymentDueDate.setMonth(nextPaymentDueDate.getMonth() + 1);
             }
 
-            // Format date according to current language
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            document.getElementById('nextPaymentDueDate').textContent = 
-                nextPaymentDueDate.toLocaleDateString(document.documentElement.lang, options);
+            document.getElementById('nextPaymentDueDate').textContent = nextPaymentDueDate.toLocaleDateString();
 
             // Calculate and display days remaining
             const today = new Date();
             const timeDiff = nextPaymentDueDate - today;
             const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
             document.getElementById('daysRemaining').textContent = daysRemaining > 0 ? daysRemaining : "0";
-        }
-
-        function displayPaymentHistory(client) {
-            const paymentTableBody = document.getElementById('paymentTable').querySelector('tbody');
-            paymentTableBody.innerHTML = ''; // Clear existing table rows
-
-            const payments = client.payments || [];
-
-            payments.forEach(payment => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${payment.date}</td>
-                    <td>${payment.amount}</td>
-                `;
-                paymentTableBody.appendChild(row);
-            });
         }
 
         function displayOpeningHoursCalendar(openingHours) {
@@ -1166,6 +1195,44 @@
                     dayCell.textContent = translations[document.documentElement.lang].notSet;
                     dayCell.classList.remove("exception-closed");
                 }
+            });
+        }
+
+        function displayClientMessages() {
+            const messagesRef = ref(db, 'messages');
+            const messagesList = document.getElementById('messagesList');
+            
+            // Afficher le message de chargement
+            messagesList.innerHTML = `<p>${translations[document.documentElement.lang].loading_messages}</p>`;
+
+            get(messagesRef).then((snapshot) => {
+                const messages = snapshot.val() || {};
+                messagesList.innerHTML = '';
+
+                let hasActiveMessages = false;
+
+                Object.values(messages).forEach(message => {
+                    const expiryDate = new Date(message.expiryDate);
+                    if (expiryDate > new Date()) {
+                        hasActiveMessages = true;
+                        const messageCard = document.createElement('div');
+                        messageCard.className = `message-card${message.important ? ' important' : ''}`;
+                        
+                        messageCard.innerHTML = `
+                            <div class="message-title">${message.title}</div>
+                            <div class="message-content">${message.content}</div>
+                        `;
+                        
+                        messagesList.appendChild(messageCard);
+                    }
+                });
+
+                if (!hasActiveMessages) {
+                    messagesList.innerHTML = `<p>${translations[document.documentElement.lang].no_messages}</p>`;
+                }
+            }).catch(error => {
+                console.error('Erreur lors du chargement des messages:', error);
+                messagesList.innerHTML = `<p class="error-message">${translations[document.documentElement.lang].error_loading_messages}</p>`;
             });
         }
 
