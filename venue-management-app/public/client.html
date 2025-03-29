@@ -180,7 +180,7 @@
             box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
             border: none;
             margin-bottom: 30px;
-            background-color: #fff;
+            background-color: #ffffff;
         }
 
         .m-r-0 {
@@ -643,43 +643,403 @@
 
         /* Messages Page Styles */
         .messages-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 20px auto;
             padding: 20px;
-        }
-
-        .message-card {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
         }
 
-        .message-card:hover {
+        .conversation-container {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .conversation-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .conversation-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .conversation-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .conversation-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin: 5px 0;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .message-bubble:hover {
             transform: translateY(-2px);
         }
 
-        .message-card.important {
-            border-left: 4px solid #ff4444;
+        .message-bubble.client {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+            margin-left: 20%;
+            border: none;
         }
 
-        .message-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .message-bubble.client .message-content {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .message-bubble.client .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-bubble.client .message-status {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-bubble.client .status-icon {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .message-bubble.client.unread {
+            background: linear-gradient(135deg, #2980b9, #2472a4);
+            border-left: 4px solid #ffffff;
+            animation: pulse 2s infinite;
+        }
+
+        .message-bubble.admin {
+            background: #ffffff;
             color: #2c3e50;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e0e0e0;
+            margin-right: 20%;
+        }
+
+        .message-bubble.unread {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            animation: pulse 2s infinite;
         }
 
         .message-content {
-            margin-bottom: 15px;
+            font-size: 1.1em;
             line-height: 1.5;
+            margin-bottom: 8px;
+            color: inherit;
         }
 
-        .message-date {
-            font-size: 0.9em;
+        .message-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-top: 5px;
+            display: block;
+            color: inherit;
+        }
+
+        .message-status {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.8em;
+            color: inherit;
+        }
+
+        .message-form {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            border: 1px solid #e0e0e0;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .message-form textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            resize: none;
+            height: 60px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .message-form textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .message-form button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            height: 60px;
+        }
+
+        .message-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .message-form button i {
+            font-size: 1.2em;
+        }
+
+        .no-messages {
+            text-align: center;
+            padding: 40px;
             color: #666;
+            font-size: 1.2em;
+        }
+
+        .no-messages i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #3498db;
+            opacity: 0.5;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .toast.error {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .toast i {
+            font-size: 1.2em;
+        }
+
+        .toast.success i {
+            color: #2ecc71;
+        }
+
+        .toast.error i {
+            color: #e74c3c;
+        }
+
+        /* Notification Badge Improvements */
+        .notification-badge {
+            background: linear-gradient(135deg, #ff4444, #ff6b6b);
+            color: white;
+            border-radius: 50%;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            animation: badgePulse 2s infinite;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+        }
+
+        @keyframes badgePulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Message Status Indicators */
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .status-icon {
+            font-size: 1em;
+        }
+
+        .status-sent {
+            color: #2ecc71;
+        }
+
+        .status-delivered {
+            color: #3498db;
+        }
+
+        .status-read {
+            color: #2ecc71;
+        }
+
+        /* Message Tabs Styles */
+        .message-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .message-tab {
+            display: none;
+        }
+
+        .message-tab.active {
+            display: block;
+        }
+
+        /* Notification Badge Styles */
+        .notification-badge {
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .nav-links a {
+            position: relative;
+        }
+
+        /* Footer Styles */
+        .footer-sidebar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(44, 62, 80, 0.7);
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .copyright {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            opacity: 0.7;
         }
     </style>
 </head>
@@ -727,6 +1087,14 @@
                         <a href="#messages" data-page="messages">
                             <i class="fas fa-bell"></i>
                             <span data-i18n="nav_messages">Messages</span>
+                            <span id="notificationBadge" class="notification-badge" style="display: none;">!</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#contact" data-page="contact">
+                            <i class="fas fa-envelope"></i>
+                            <span data-i18n="nav_contact">Contact</span>
+                            <span id="contactNotificationBadge" class="notification-badge" style="display: none;">!</span>
                         </a>
                     </li>
                     <li>
@@ -838,15 +1206,36 @@
         <div id="messagesPage" class="page">
             <div class="messages-container">
                 <h2 data-i18n="messages_title">Messages</h2>
-                <div id="messagesList" data-loading-text="loading_messages" data-empty-text="no_messages"></div>
+                <div class="public-messages-section">
+                    <div id="messagesList" data-loading-text="loading_messages" data-empty-text="no_messages"></div>
+                </div>
             </div>
         </div>
+
+        <!-- Contact Page -->
+        <div id="contactPage" class="page">
+            <div class="messages-container">
+                <h2 data-i18n="contact_title">Contact</h2>
+                <div class="conversation-container" id="contactMessagesList"></div>
+                <div class="message-form">
+                    <textarea id="contactMessageContent" placeholder="Écrivez votre message ici..."></textarea>
+                    <button onclick="sendContactMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                        <span data-i18n="send_message">Envoyer</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-sidebar">
+        <p class="copyright">Salah MHJ &copy; 2025</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
+        import { getDatabase, ref, get, push, onValue, update } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCnX9zBVZN4_VhfP-bbswmZRfUeUUiCKEE",
@@ -933,7 +1322,16 @@
                 profile_days_remaining: "Jours Restants",
                 profile_payment_due: "Prochain Paiement le",
                 profile_monthly_tariff: "Tarif Mensuel",
-                profile_remaining_days: "Jours Restants"
+                profile_remaining_days: "Jours Restants",
+                private_messages_title: "Messages Privés",
+                public_messages_title: "Messages Publics",
+                send_message: "Envoyer",
+                message_sent: "Message envoyé avec succès",
+                error_sending_message: "Erreur lors de l'envoi du message",
+                no_private_messages: "Aucun message privé",
+                loading_private_messages: "Chargement des messages privés...",
+                contact_title: "Contact",
+                nav_contact: "Contact"
             },
             en: {
                 title: "Client Area",
@@ -973,7 +1371,16 @@
                 profile_days_remaining: "Days Remaining",
                 profile_payment_due: "Next Payment Due",
                 profile_monthly_tariff: "Monthly Tariff",
-                profile_remaining_days: "Remaining Days"
+                profile_remaining_days: "Remaining Days",
+                private_messages_title: "Private Messages",
+                public_messages_title: "Public Messages",
+                send_message: "Send",
+                message_sent: "Message sent successfully",
+                error_sending_message: "Error sending message",
+                no_private_messages: "No private messages",
+                loading_private_messages: "Loading private messages...",
+                contact_title: "Contact",
+                nav_contact: "Contact"
             },
             ar: {
                 title: "منطقة العميل",
@@ -1013,7 +1420,16 @@
                 profile_days_remaining: "الأيام المتبقية",
                 profile_payment_due: "موعد الدفع القادم",
                 profile_monthly_tariff: "التعريفة الشهرية",
-                profile_remaining_days: "الأيام المتبقية"
+                profile_remaining_days: "الأيام المتبقية",
+                private_messages_title: "الرسائل الخاصة",
+                public_messages_title: "الرسائل العامة",
+                send_message: "إرسال",
+                message_sent: "تم إرسال الرسالة بنجاح",
+                error_sending_message: "خطأ في إرسال الرسالة",
+                no_private_messages: "لا توجد رسائل خاصة",
+                loading_private_messages: "جاري تحميل الرسائل الخاصة...",
+                contact_title: "اتصل بنا",
+                nav_contact: "اتصل بنا"
             }
         };
 
@@ -1116,13 +1532,18 @@
                 });
 
                 if (clientFound) {
+                    // Stocker les informations du client
+                    window.currentClient = clientFound;
+                    
                     // Success - show main content
                     displayClientInfo(clientFound);
                     displayOpeningHoursCalendar(openingHoursSnapshot.val());
                     displayClientMessages();
+                    setupClientMessagesListener();
                     document.getElementById('loginForm').style.display = 'none';
                     document.getElementById('mainContent').style.display = 'block';
                     window.showPage('profile');
+                    checkUnreadMessages();
                 } else {
                     alert("Invalid credentials");
                 }
@@ -1243,6 +1664,260 @@
                 document.getElementById('mainContent').style.display = 'none';
                 window.showPage('profile'); // Utiliser window.showPage
             }).catch((error) => console.error("Error logging out:", error));
+        };
+
+        // Fonction pour jouer un son de notification
+        function playNotificationSound() {
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play().catch(error => console.log('Audio play failed:', error));
+        }
+
+        // Fonction pour afficher une notification toast
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Modifier la fonction displayPrivateMessages
+        function displayPrivateMessages(messages) {
+            const messagesList = document.getElementById('contactMessagesList');
+            
+            if (!messages) {
+                messagesList.innerHTML = `
+                    <div class="no-messages">
+                        <i class="fas fa-comments"></i>
+                        <p>${translations[document.documentElement.lang].no_private_messages}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const currentClient = getCurrentClient();
+            if (!currentClient) return;
+
+            let hasMessages = false;
+            let messagesHtml = '';
+            let allMessages = [];
+
+            // Fonction pour formater la date
+            function formatMessageDate(timestamp) {
+                const date = new Date(timestamp);
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                // Si c'est aujourd'hui
+                if (date.toDateString() === today.toDateString()) {
+                    return `Aujourd'hui à ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+                // Si c'est hier
+                else if (date.toDateString() === yesterday.toDateString()) {
+                    return `Hier à ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+                // Sinon, afficher la date complète
+                else {
+                    return date.toLocaleDateString('fr-FR', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            }
+
+            // Afficher les messages de l'admin
+            const clientMessagesRef = ref(db, `clients/${currentClient.key}/messages`);
+            get(clientMessagesRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const clientMessages = snapshot.val();
+                    for (const [key, message] of Object.entries(clientMessages)) {
+                        hasMessages = true;
+                        allMessages.push({
+                            ...message,
+                            key: key,
+                            isAdmin: true,
+                            timestamp: message.timestamp
+                        });
+
+                        if (!message.read) {
+                            update(ref(db, `clients/${currentClient.key}/messages/${key}`), { read: true })
+                                .then(() => {
+                                    checkUnreadMessages();
+                                    playNotificationSound();
+                                });
+                        }
+                    }
+                }
+
+                // Afficher les messages du client
+                for (const [key, message] of Object.entries(messages)) {
+                    if (message.clientId === currentClient.key) {
+                        hasMessages = true;
+                        allMessages.push({
+                            ...message,
+                            key: key,
+                            isAdmin: false,
+                            timestamp: message.timestamp
+                        });
+                    }
+                }
+
+                // Trier les messages par date
+                allMessages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                // Générer le HTML pour tous les messages triés
+                allMessages.forEach(message => {
+                    messagesHtml += `
+                        <div class="message-bubble ${message.isAdmin ? 'admin' : 'client'}${!message.read ? ' unread' : ''}">
+                            <div class="message-content">${message.content}</div>
+                            <span class="message-time">${formatMessageDate(message.timestamp)}</span>
+                            <div class="message-status">
+                                <i class="fas fa-check-double status-icon status-read"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (!hasMessages) {
+                    messagesHtml = `
+                        <div class="no-messages">
+                            <i class="fas fa-comments"></i>
+                            <p>${translations[document.documentElement.lang].no_private_messages}</p>
+                        </div>
+                    `;
+                }
+
+                messagesList.innerHTML = messagesHtml;
+                // Faire défiler vers le bas
+                messagesList.scrollTop = messagesList.scrollHeight;
+            });
+        }
+
+        // Fonction pour obtenir le client actuel
+        function getCurrentClient() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const cin = document.getElementById('cin').value;
+            
+            // Stocker les informations du client lors de la connexion
+            if (window.currentClient) {
+                return window.currentClient;
+            }
+            return null;
+        }
+
+        // Écouter les changements dans la collection des messages privés
+        onValue(ref(db, 'privateMessages'), (snapshot) => {
+            const messages = snapshot.val() || {};
+            displayPrivateMessages(messages);
+        });
+
+        // Écouter les changements dans les messages du client
+        function setupClientMessagesListener() {
+            const currentClient = getCurrentClient();
+            if (currentClient) {
+                const clientMessagesRef = ref(db, `clients/${currentClient.key}/messages`);
+                onValue(clientMessagesRef, (snapshot) => {
+                    const messages = snapshot.val() || {};
+                    displayPrivateMessages(messages);
+                });
+            }
+        }
+
+        // Fonction pour basculer entre les onglets de messages
+        window.switchMessageTab = function(tab) {
+            // Mettre à jour les boutons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Mettre à jour les onglets
+            document.querySelectorAll('.message-tab').forEach(tabContent => {
+                tabContent.classList.remove('active');
+            });
+            document.getElementById(tab + 'MessagesTab').classList.add('active');
+        };
+
+        // Fonction pour vérifier les messages non lus
+        function checkUnreadMessages() {
+            const currentClient = getCurrentClient();
+            if (!currentClient) return;
+
+            const clientMessagesRef = ref(db, `clients/${currentClient.key}/messages`);
+            get(clientMessagesRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const messages = snapshot.val();
+                    let hasUnread = false;
+                    
+                    for (const message of Object.values(messages)) {
+                        if (!message.read) {
+                            hasUnread = true;
+                            break;
+                        }
+                    }
+
+                    const contactBadge = document.getElementById('contactNotificationBadge');
+                    if (contactBadge) {
+                        contactBadge.style.display = hasUnread ? 'block' : 'none';
+                    }
+                }
+            });
+        }
+
+        // Vérifier les messages non lus périodiquement
+        setInterval(checkUnreadMessages, 30000); // Vérifier toutes les 30 secondes
+
+        // Ajouter la fonction d'envoi de message pour la section contact
+        window.sendContactMessage = function() {
+            const content = document.getElementById('contactMessageContent').value.trim();
+            if (!content) {
+                showToast('Veuillez écrire un message', 'error');
+                return;
+            }
+
+            const currentClient = getCurrentClient();
+            if (!currentClient) {
+                showToast('Erreur: Client non trouvé', 'error');
+                return;
+            }
+
+            const privateMessage = {
+                content: content,
+                clientId: currentClient.key,
+                clientName: `${currentClient.firstName} ${currentClient.lastName}`,
+                timestamp: new Date().toISOString(),
+                read: false,
+                status: 'sent'
+            };
+
+            const privateMessagesRef = ref(db, 'privateMessages');
+            push(privateMessagesRef, privateMessage)
+                .then(() => {
+                    document.getElementById('contactMessageContent').value = '';
+                    showToast(translations[document.documentElement.lang].message_sent, 'success');
+                    playNotificationSound();
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de l\'envoi du message:', error);
+                    showToast(translations[document.documentElement.lang].error_sending_message, 'error');
+                });
         };
     </script>
 </body>
