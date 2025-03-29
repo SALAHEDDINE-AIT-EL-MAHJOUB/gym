@@ -673,6 +673,86 @@
                 console.error('Error searching clients:', error);
             });
         };
+
+        window.addMessage = function() {
+            const title = document.getElementById('messageTitle').value;
+            const content = document.getElementById('messageContent').value;
+            const expiryDays = parseInt(document.getElementById('messageExpiry').value);
+            const important = document.getElementById('messageImportant').checked;
+
+            if (!title || !content || !expiryDays) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const message = {
+                title: title,
+                content: content,
+                createdAt: new Date().toISOString(),
+                expiryDate: new Date(Date.now() + (expiryDays * 24 * 60 * 60 * 1000)).toISOString(),
+                important: important
+            };
+
+            const messagesRef = ref(db, 'messages');
+            push(messagesRef, message)
+                .then(() => {
+                    document.getElementById('messageForm').reset();
+                    alert('Message publié avec succès');
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de la publication du message:', error);
+                    alert('Erreur lors de la publication du message');
+                });
+        };
+
+        // Fonction pour afficher les messages dans le tableau
+        function displayMessages(messages) {
+            const tbody = document.querySelector('#messagesTable tbody');
+            tbody.innerHTML = '';
+
+            for (const [key, message] of Object.entries(messages)) {
+                const row = document.createElement('tr');
+                if (message.important) {
+                    row.classList.add('message-important');
+                }
+
+                const expiryDate = new Date(message.expiryDate);
+                const isExpired = expiryDate < new Date();
+
+                if (!isExpired) {
+                    row.innerHTML = `
+                        <td>${message.title}</td>
+                        <td>${message.content}</td>
+                        <td>${new Date(message.expiryDate).toLocaleDateString()}</td>
+                        <td>${message.important ? 'Oui' : 'Non'}</td>
+                        <td>
+                            <button onclick="deleteMessage('${key}')">Supprimer</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                }
+            }
+        }
+
+        // Écouter les changements dans la collection messages
+        onValue(ref(db, 'messages'), (snapshot) => {
+            const messages = snapshot.val() || {};
+            displayMessages(messages);
+        });
+
+        // Fonction pour supprimer un message
+        window.deleteMessage = function(messageId) {
+            if (confirm('Voulez-vous vraiment supprimer ce message ?')) {
+                remove(ref(db, `messages/${messageId}`))
+                    .then(() => {
+                        alert('Message supprimé avec succès');
+                    })
+                    .catch((error) => {
+                        console.error('Erreur lors de la suppression du message:', error);
+                        alert('Erreur lors de la suppression du message');
+                    });
+            }
+        };
     </script>
     <style>
         body {
@@ -1168,6 +1248,33 @@
         .page.active {
             display: block;
         }
+
+        .message-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .message-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .messages-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .message-important {
+            background-color: #fff3f3;
+        }
     </style>
 </head>
 <body>
@@ -1176,6 +1283,9 @@
         <ul class="nav-links">
             <li><a href="#" onclick="showSection('scheduleTariffSection')" class="active">Horaires et Tarifs</a></li>
             <li><a href="#" onclick="showSection('clientManagementSection')">Gestion des Clients</a></li>
+            <li><a href="#" onclick="showSection('messagesSection')">
+                <i class="fas fa-envelope"></i> Messages
+            </a></li>
         </ul>
     </nav>
 
@@ -1282,6 +1392,47 @@
             <button type="button" onclick="addClient()">Ajouter un Client</button>
         </form>
         <table id="clientsTable"></table>
+    </section>
+
+    <!-- Gestion des Messages Section -->
+    <section id="messagesSection" class="page">
+        <h2>Gestion des Messages</h2>
+        <div class="message-form">
+            <form id="messageForm">
+                <div class="form-group">
+                    <label for="messageTitle">Titre du Message:</label>
+                    <input type="text" id="messageTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="messageContent">Contenu:</label>
+                    <textarea id="messageContent" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="messageExpiry">Durée d'affichage (en jours):</label>
+                    <input type="number" id="messageExpiry" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="messageImportant">Message Important:</label>
+                    <input type="checkbox" id="messageImportant">
+                </div>
+                <button type="button" onclick="addMessage()">Publier le Message</button>
+            </form>
+        </div>
+        <div class="messages-list">
+            <h3>Messages Actifs</h3>
+            <table id="messagesTable">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Contenu</th>
+                        <th>Date d'Expiration</th>
+                        <th>Important</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </section>
 
     <!-- Existing Modals -->
