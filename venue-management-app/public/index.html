@@ -1118,248 +1118,301 @@
         .close:hover {
             color: #e74c3c;
         }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            background-color: var(--secondary-color);
+        }
+
+        /* Section Visibility */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-   <h2>Admin Panel</h2>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="#" onclick="showSection('scheduleTariffSection')" class="active">Horaires et Tarifs</a></li>
+            <li><a href="#" onclick="showSection('clientManagementSection')">Gestion des Clients</a></li>
+        </ul>
+    </nav>
 
-    
-
-    <!-- Add Client Icon -->
-   
-
-    
-
-    <section>
-       <button onclick="setGlobalTariff()">Set Global Tariff</button>
-        <button onclick="openOpeningHoursModal()">Set Opening Hours</button>
-        
-        <br>
-        <br>
-        <input type="text" id="searchKeyword" placeholder="Search by keyword">
-        <button onclick="searchClients()">Search</button>
-        <button  onclick="toggleAddClientForm()" class="fas fa-plus-circle"> Add Client</button>
-        <table id="clientsTable"></table>
+    <!-- Horaires et Tarifs Section -->
+    <section id="scheduleTariffSection" class="page active">
+        <h2>Gestion des Horaires et Tarifs</h2>
+        <button onclick="setGlobalTariff()">Définir le Tarif Global</button>
+        <button onclick="openOpeningHoursModal()">Définir les Horaires d'Ouverture</button>
+        <section>
+            <h2>Horaires d'Ouverture</h2>
+            <table id="openingHoursDisplay">
+                <thead>
+                    <tr>
+                        <th>Jour</th>
+                        <th>Heure d'ouverture</th>
+                        <th>Heure de fermeture</th>
+                        <th>Fermé</th>
+                        <th>Fermeture Exceptionnelle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Monday</td>
+                        <td id="MondayOpeningTimeDisplay"></td>
+                        <td id="MondayClosingTimeDisplay"></td>
+                        <td id="MondayClosedDisplay"></td>
+                        <td id="MondayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Tuesday</td>
+                        <td id="TuesdayOpeningTimeDisplay"></td>
+                        <td id="TuesdayClosingTimeDisplay"></td>
+                        <td id="TuesdayClosedDisplay"></td>
+                        <td id="TuesdayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Wednesday</td>
+                        <td id="WednesdayOpeningTimeDisplay"></td>
+                        <td id="WednesdayClosingTimeDisplay"></td>
+                        <td id="WednesdayClosedDisplay"></td>
+                        <td id="WednesdayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Thursday</td>
+                        <td id="ThursdayOpeningTimeDisplay"></td>
+                        <td id="ThursdayClosingTimeDisplay"></td>
+                        <td id="ThursdayClosedDisplay"></td>
+                        <td id="ThursdayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Friday</td>
+                        <td id="FridayOpeningTimeDisplay"></td>
+                        <td id="FridayClosingTimeDisplay"></td>
+                        <td id="FridayClosedDisplay"></td>
+                        <td id="FridayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Saturday</td>
+                        <td id="SaturdayOpeningTimeDisplay"></td>
+                        <td id="SaturdayClosingTimeDisplay"></td>
+                        <td id="SaturdayClosedDisplay"></td>
+                        <td id="SaturdayExceptionallyClosedDisplay"></td>
+                    </tr>
+                    <tr>
+                        <td>Sunday</td>
+                        <td id="SundayOpeningTimeDisplay"></td>
+                        <td id="SundayClosingTimeDisplay"></td>
+                        <td id="SundayClosedDisplay"></td>
+                        <td id="SundayExceptionallyClosedDisplay"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </section>
 
-    <!-- Add Payment Modal -->
-    <div id="addPaymentModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeAddPaymentModal()">&times;</span>
-            <h2>Add Payment</h2>
-            <div>
-                <label for="newPaymentDate">Payment Date:</label>
-                <input type="date" id="newPaymentDate">
-            </div>
-            <div>
-                <label for="paymentAmount">Payment Amount:</label>
-                <input type="number" id="paymentAmount">
-            </div>
-            <p id="paymentError" style="color: red;"></p>
-            <button onclick="addPayment()">Add Payment</button>
-        </div>
-    </div>
-
-    <!-- Edit Client Modal -->
-    <div id="editClientModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditClientModal()">&times;</span>
-            <h2>Edit Client</h2>
-            <div>
-                <label for="editCin">CIN:</label>
-                <input type="text" id="editCin">
-            </div>
-            <div>
-                <label for="editPhoneNumber">Phone Number:</label>
-                <input type="tel" id="editPhoneNumber">
-            </div>
-            <div>
-                <label for="editFirstName">First Name:</label>
-                <input type="text" id="editFirstName">
-            </div>
-            <div>
-                <label for="editLastName">Last Name:</label>
-                <input type="text" id="editLastName">
-            </div>
-            <button onclick="editClient()">Save Changes</button>
-            <button onclick="confirmDeleteClient()">Delete Profile</button>
-        </div>
-    </div>
-
-    <!-- Payment History Modal -->
-    <div id="paymentHistoryModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closePaymentHistoryModal()">&times;</span>
-            <h2>Payment History</h2>
-            <div id="paymentList"></div>
-        </div>
-    </div>
-
-    <!-- Opening Hours Modal -->
-    <div id="openingHoursModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeOpeningHoursModal()">&times;</span>
-            <h2>Set Opening Hours</h2>
-            <div id="openingHoursForm">
-                <div>
-                    <label>Monday:</label>
-                    <input type="time" id="MondayOpeningTime">
-                    <input type="time" id="MondayClosingTime">
-                    <label for="MondayClosed">Closed</label>
-                    <input type="checkbox" id="MondayClosed">
-                     <label for="MondayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="MondayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Tuesday:</label>
-                    <input type="time" id="TuesdayOpeningTime">
-                    <input type="time" id="TuesdayClosingTime">
-                    <label for="TuesdayClosed">Closed</label>
-                    <input type="checkbox" id="TuesdayClosed">
-                     <label for="TuesdayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="TuesdayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Wednesday:</label>
-                    <input type="time" id="WednesdayOpeningTime">
-                    <input type="time" id="WednesdayClosingTime">
-                    <label for="WednesdayClosed">Closed</label>
-                    <input type="checkbox" id="WednesdayClosed">
-                     <label for="WednesdayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="WednesdayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Thursday:</label>
-                    <input type="time" id="ThursdayOpeningTime">
-                    <input type="time" id="ThursdayClosingTime">
-                    <label for="ThursdayClosed">Closed</label>
-                    <input type="checkbox" id="ThursdayClosed">
-                     <label for="ThursdayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="ThursdayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Friday:</label>
-                    <input type="time" id="FridayOpeningTime">
-                    <input type="time" id="FridayClosingTime">
-                    <label for="FridayClosed">Closed</label>
-                    <input type="checkbox" id="FridayClosed">
-                     <label for="FridayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="FridayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Saturday:</label>
-                    <input type="time" id="SaturdayOpeningTime">
-                    <input type="time" id="SaturdayClosingTime">
-                    <label for="SaturdayClosed">Closed</label>
-                    <input type="checkbox" id="SaturdayClosed">
-                     <label for="SaturdayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="SaturdayExceptionallyClosed">
-                </div>
-                <div>
-                    <label>Sunday:</label>
-                    <input type="time" id="SundayOpeningTime">
-                    <input type="time" id="SundayClosingTime">
-                    <label for="SundayClosed">Closed</label>
-                    <input type="checkbox" id="SundayClosed">
-                     <label for="SundayExceptionallyClosed">Exceptionally Closed</label>
-                    <input type="checkbox" id="SundayExceptionallyClosed">
-                </div>
-            </div>
-            <button onclick="saveOpeningHours()">Save Opening Hours</button>
-        </div>
-    </div>
-    <section>
-       
+    <!-- Gestion des Clients Section -->
+    <section id="clientManagementSection" class="page">
+        <h2>Gestion et Recherche des Clients</h2>
+        <input type="text" id="searchKeyword" placeholder="Rechercher par mot-clé">
+        <button onclick="searchClients()">Rechercher</button>
+        <button onclick="toggleAddClientForm()">Ajouter un Client</button>
         <form id="addClientForm">
-         <h2>Add Client</h2>
+            <h2>Ajouter un Client</h2>
             <div>
                 <label for="cin">CIN:</label>
                 <input type="text" id="cin" required>
             </div>
             <div>
-                <label for="phoneNumber">Phone Number:</label>
+                <label for="phoneNumber">Numéro de Téléphone:</label>
                 <input type="tel" id="phoneNumber" required>
             </div>
             <div>
-                <label for="firstName">First Name:</label>
+                <label for="firstName">Prénom:</label>
                 <input type="text" id="firstName" required>
             </div>
             <div>
-                <label for="lastName">Last Name:</label>
+                <label for="lastName">Nom:</label>
                 <input type="text" id="lastName" required>
             </div>
             <div>
-                <label for="paymentDate">Initial Payment Date:</label>
+                <label for="paymentDate">Date de Paiement Initial:</label>
                 <input type="date" id="paymentDate">
             </div>
-            <button type="button" onclick="addClient()">Add Client</button>
+            <button type="button" onclick="addClient()">Ajouter un Client</button>
         </form>
+        <table id="clientsTable"></table>
     </section>
-    <section>
-        
-              <h2>Opening Hours</h2>
-        <table id="openingHoursDisplay">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Opening Time</th>
-                    <th>Closing Time</th>
-                    <th>Closed</th>
-                    <th>Exceptionally Closed</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Monday</td>
-                    <td id="MondayOpeningTimeDisplay"></td>
-                    <td id="MondayClosingTimeDisplay"></td>
-                    <td id="MondayClosedDisplay"></td>
-                    <td id="MondayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Tuesday</td>
-                    <td id="TuesdayOpeningTimeDisplay"></td>
-                    <td id="TuesdayClosingTimeDisplay"></td>
-                    <td id="TuesdayClosedDisplay"></td>
-                    <td id="TuesdayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Wednesday</td>
-                    <td id="WednesdayOpeningTimeDisplay"></td>
-                    <td id="WednesdayClosingTimeDisplay"></td>
-                    <td id="WednesdayClosedDisplay"></td>
-                    <td id="WednesdayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Thursday</td>
-                    <td id="ThursdayOpeningTimeDisplay"></td>
-                    <td id="ThursdayClosingTimeDisplay"></td>
-                    <td id="ThursdayClosedDisplay"></td>
-                    <td id="ThursdayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Friday</td>
-                    <td id="FridayOpeningTimeDisplay"></td>
-                    <td id="FridayClosingTimeDisplay"></td>
-                    <td id="FridayClosedDisplay"></td>
-                    <td id="FridayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Saturday</td>
-                    <td id="SaturdayOpeningTimeDisplay"></td>
-                    <td id="SaturdayClosingTimeDisplay"></td>
-                    <td id="SaturdayClosedDisplay"></td>
-                    <td id="SaturdayExceptionallyClosedDisplay"></td>
-                </tr>
-                <tr>
-                    <td>Sunday</td>
-                    <td id="SundayOpeningTimeDisplay"></td>
-                    <td id="SundayClosingTimeDisplay"></td>
-                    <td id="SundayClosedDisplay"></td>
-                    <td id="SundayExceptionallyClosedDisplay"></td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+
+    <!-- Existing Modals -->
+    <div id="addPaymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddPaymentModal()">&times;</span>
+            <h2>Ajouter un Paiement</h2>
+            <div>
+                <label for="newPaymentDate">Date de Paiement:</label>
+                <input type="date" id="newPaymentDate">
+            </div>
+            <div>
+                <label for="paymentAmount">Montant du Paiement:</label>
+                <input type="number" id="paymentAmount">
+            </div>
+            <p id="paymentError" style="color: red;"></p>
+            <button onclick="addPayment()">Ajouter un Paiement</button>
+        </div>
+    </div>
+    <div id="editClientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditClientModal()">&times;</span>
+            <h2>Modifier le Client</h2>
+            <div>
+                <label for="editCin">CIN:</label>
+                <input type="text" id="editCin">
+            </div>
+            <div>
+                <label for="editPhoneNumber">Numéro de Téléphone:</label>
+                <input type="tel" id="editPhoneNumber">
+            </div>
+            <div>
+                <label for="editFirstName">Prénom:</label>
+                <input type="text" id="editFirstName">
+            </div>
+            <div>
+                <label for="editLastName">Nom:</label>
+                <input type="text" id="editLastName">
+            </div>
+            <button onclick="editClient()">Enregistrer les Modifications</button>
+            <button onclick="confirmDeleteClient()">Supprimer le Profil</button>
+        </div>
+    </div>
+    <div id="paymentHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePaymentHistoryModal()">&times;</span>
+            <h2>Historique des Paiements</h2>
+            <div id="paymentList"></div>
+        </div>
+    </div>
+    <div id="openingHoursModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOpeningHoursModal()">&times;</span>
+            <h2>Définir les Horaires d'Ouverture</h2>
+            <div id="openingHoursForm">
+                <div>
+                    <label>Lundi:</label>
+                    <input type="time" id="MondayOpeningTime">
+                    <input type="time" id="MondayClosingTime">
+                    <label for="MondayClosed">Fermé</label>
+                    <input type="checkbox" id="MondayClosed">
+                    <label for="MondayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="MondayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Mardi:</label>
+                    <input type="time" id="TuesdayOpeningTime">
+                    <input type="time" id="TuesdayClosingTime">
+                    <label for="TuesdayClosed">Fermé</label>
+                    <input type="checkbox" id="TuesdayClosed">
+                    <label for="TuesdayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="TuesdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Mercredi:</label>
+                    <input type="time" id="WednesdayOpeningTime">
+                    <input type="time" id="WednesdayClosingTime">
+                    <label for="WednesdayClosed">Fermé</label>
+                    <input type="checkbox" id="WednesdayClosed">
+                    <label for="WednesdayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="WednesdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Jeudi:</label>
+                    <input type="time" id="ThursdayOpeningTime">
+                    <input type="time" id="ThursdayClosingTime">
+                    <label for="ThursdayClosed">Fermé</label>
+                    <input type="checkbox" id="ThursdayClosed">
+                    <label for="ThursdayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="ThursdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Vendredi:</label>
+                    <input type="time" id="FridayOpeningTime">
+                    <input type="time" id="FridayClosingTime">
+                    <label for="FridayClosed">Fermé</label>
+                    <input type="checkbox" id="FridayClosed">
+                    <label for="FridayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="FridayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Samedi:</label>
+                    <input type="time" id="SaturdayOpeningTime">
+                    <input type="time" id="SaturdayClosingTime">
+                    <label for="SaturdayClosed">Fermé</label>
+                    <input type="checkbox" id="SaturdayClosed">
+                    <label for="SaturdayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="SaturdayExceptionallyClosed">
+                </div>
+                <div>
+                    <label>Dimanche:</label>
+                    <input type="time" id="SundayOpeningTime">
+                    <input type="time" id="SundayClosingTime">
+                    <label for="SundayClosed">Fermé</label>
+                    <input type="checkbox" id="SundayClosed">
+                    <label for="SundayExceptionallyClosed">Fermeture Exceptionnelle</label>
+                    <input type="checkbox" id="SundayExceptionallyClosed">
+                </div>
+            </div>
+            <button onclick="saveOpeningHours()">Enregistrer les Horaires</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle between sections
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.page').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Highlight the corresponding nav link
+            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+    </script>
 </body>
 </html>
