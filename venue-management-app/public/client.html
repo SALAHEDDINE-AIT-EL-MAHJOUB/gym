@@ -564,6 +564,131 @@
                 transform: scale(0.98);
             }
         }
+
+        /* Updated container styles */
+        .page-content.page-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .padding {
+            padding: 1rem;
+            width: 100%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .user-card-full {
+            height: 100%;
+            margin: 0;
+        }
+
+        .row.m-l-0.m-r-0 {
+            margin: 0;
+            height: 100%;
+        }
+
+        /* Adjust mobile styles */
+        @media (max-width: 768px) {
+            .page-content.page-container {
+                padding: 0;
+                min-height: calc(100vh - 60px); /* Account for navbar */
+            }
+
+            .padding {
+                padding: 0.5rem;
+            }
+
+            .container.d-flex.justify-content-center {
+                padding: 0;
+            }
+
+            .card.user-card-full {
+                margin: 0;
+                border-radius: 0;
+            }
+        }
+
+        /* Hide overflow on body when showing client info */
+        body.showing-client-info {
+            overflow: hidden;
+        }
+
+        /* Updated card styles for larger size */
+        .user-card-full {
+            min-height: 85vh;
+            width: 100%;
+            margin: 0;
+        }
+
+        .img-radius {
+            width: 180px;
+            height: 180px;
+            margin: 2rem auto;
+        }
+
+        .f-w-600 {
+            font-size: 1.8rem;
+            margin: 1rem 0;
+        }
+
+        .card-block {
+            padding: 2rem;
+        }
+
+        .m-b-10 {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-muted {
+            font-size: 1.2rem;
+        }
+
+        .bg-c-lite-green {
+            padding: 3rem 0;
+        }
+
+        .col-sm-4.bg-c-lite-green {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Adjust mobile styles */
+        @media (max-width: 768px) {
+            .user-card-full {
+                min-height: auto;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                min-height: auto;
+                padding: 2rem 0;
+            }
+
+            .img-radius {
+                width: 150px;
+                height: 150px;
+                margin: 1rem auto;
+            }
+
+            .f-w-600 {
+                font-size: 1.5rem;
+            }
+
+            .text-muted {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -971,6 +1096,12 @@
             // Show selected page and highlight nav link
             document.getElementById(pageId + 'Page').classList.add('active');
             document.querySelector(`[onclick="showPage('${pageId}')"]`).classList.add('active');
+
+            if (pageId === 'profile') {
+                document.body.classList.add('showing-client-info');
+            } else {
+                document.body.classList.remove('showing-client-info');
+            }
         };
 
         // Update logout function
