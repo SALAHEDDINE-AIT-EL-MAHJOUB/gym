@@ -136,7 +136,7 @@
             }
 
             #loginForm {
-                max-width: 500px;
+                max-width: 700px; /* previously 500px */
                 margin: 20px auto;
             }
 
@@ -196,12 +196,23 @@
         }
 
         .bg-c-lite-green {
-            background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
-            background: linear-gradient(to right, #ee5a6f, #f29263);
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            padding: 3rem 0;
         }
 
         .user-profile {
-            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .img-radius {
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+            border: 5px solid rgba(255,255,255,0.3);
         }
 
         .card-block {
@@ -210,10 +221,6 @@
 
         .m-b-25 {
             margin-bottom: 25px;
-        }
-
-        .img-radius {
-            border-radius: 5px;
         }
 
         h6 {
@@ -232,36 +239,37 @@
 
         /* Navbar Styles */
         .navbar {
-            position: relative;
-            background: #2c3e50;
+            background: linear-gradient(45deg, #2c3e50, #3498db);
             padding: 1rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .nav-links {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
-            gap: 2rem;
-            list-style: none;
-            margin: 0;
+            justify-content: space-around;
+            align-items: center;
             padding: 0;
         }
 
         .nav-links li a {
             color: white;
             text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .nav-links li a:hover {
-            background-color: #34495e;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .nav-links li a.active {
-            background-color: #3498db;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         /* Hamburger Menu Styles */
@@ -289,6 +297,23 @@
             transition: all 0.3s linear;
         }
 
+        /* Hamburger Animation */
+        .menu-toggle span {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
         /* Page Visibility */
         .page {
             display: none;
@@ -302,6 +327,7 @@
         @media (max-width: 768px) {
             body {
                 padding: 10px;
+                padding-top: 60px; /* Pour la navbar fixe */
             }
 
             .menu-toggle {
@@ -310,34 +336,26 @@
 
             .nav-links {
                 display: none;
-                width: 100%;
-                position: absolute;
-                top: 100%;
+                position: fixed;
+                top: 60px;
                 left: 0;
-                background: #2c3e50;
-                padding: 0;
-                margin: 0;
+                right: 0;
+                background: linear-gradient(45deg, #2c3e50, #3498db);
                 flex-direction: column;
-                border-radius: 0 0 8px 8px;
+                padding: 1rem 0;
+                transition: transform 0.3s ease-in-out;
+                transform: translateY(-100%);
             }
 
             .nav-links.active {
                 display: flex;
+                transform: translateY(0);
             }
 
             .nav-links li {
                 width: 100%;
                 text-align: center;
-            }
-
-            .nav-links li a {
-                padding: 15px;
-                display: block;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-
-            .nav-links li:last-child a {
-                border-bottom: none;
+                margin: 0.5rem 0;
             }
 
             .menu-toggle.active span:first-child {
@@ -357,7 +375,8 @@
             }
 
             .user-profile {
-                padding: 30px 0;
+                text-align: center;
+                padding: 2rem 1rem;
             }
 
             .img-radius {
@@ -367,6 +386,7 @@
 
             .card {
                 margin: 10px 0;
+                border-radius: 15px;
             }
 
             .user-card-full .user-profile {
@@ -383,7 +403,7 @@
             }
 
             .card-block {
-                padding: 1rem;
+                padding: 1.5rem;
             }
 
             .row {
@@ -567,12 +587,7 @@
 
         /* Updated container styles */
         .page-content.page-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-            width: 100%;
+            padding: 2rem;
         }
 
         .padding {
@@ -585,6 +600,11 @@
             max-width: none;
             margin: 0;
             padding: 0;
+        }
+
+        .container.d-flex.justify-content-center {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .user-card-full {
@@ -732,6 +752,45 @@
                 min-height: auto;
             }
         }
+
+        /* UI Improvements */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .bg-c-lite-green {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+        }
+
+        .img-radius {
+            border: 4px solid rgba(255,255,255,0.3);
+            padding: 3px;
+            transition: transform 0.3s ease;
+        }
+
+        .img-radius:hover {
+            transform: scale(1.05);
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #2ecc71;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -783,7 +842,7 @@
                                                     <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
                                                 </div>
                                                 <h6 class="f-w-600" id="clientName"></h6>
-                                                <p>Membre Actif</p>
+                                                <span class="status-indicator status-active">Membre Actif</span>
                                                 <i class="fas fa-edit m-t-40"></i>
                                             </div>
                                         </div>
@@ -794,21 +853,20 @@
                                                     <div class="col-sm-6">
                                                         <p class="m-b-10 f-w-600">Prochain Paiement</p>
                                                         <h6 class="text-muted f-w-400" id="nextPaymentDueDate"></h6>
+                                                        
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <p class="m-b-10 f-w-600">Tarif Mensuel</p>
+                                                        <p class="m-b-10 f-w-600">Tarif Mensuel:</p>
                                                         <h6 class="text-muted f-w-400" id="clientTariff"></h6>
+                                                       
                                                     </div>
                                                 </div>
-                                                <h6 class="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Statut</h6>
+                                                
                                                 <div class="row">
                                                     <div class="col-sm-6">
                                                         <p class="m-b-10 f-w-600">Jours Restants</p>
                                                         <h6 class="text-muted f-w-400" id="daysRemaining"></h6>
-                                                    </div>
-                                                    <div class="col-sm-6">
-                                                        <p class="m-b-10 f-w-600">État</p>
-                                                        <h6 class="text-muted f-w-400" id="clientStatus">Actif</h6>
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -1142,26 +1200,57 @@
             });
         }
 
-        // Add new navigation function
-        window.showPage = function(pageId) {
-            // Remove active class from all pages and links
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.classList.remove('active');
-            });
+        // Amélioration de la navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const pages = document.querySelectorAll('.page');
+            const menuToggle = document.querySelector('.menu-toggle');
 
-            // Show selected page and highlight nav link
-            document.getElementById(pageId + 'Page').classList.add('active');
-            document.querySelector(`[onclick="showPage('${pageId}')"]`).classList.add('active');
+            // Navigation automatique
+            function navigateToPage(pageId) {
+                pages.forEach(page => page.classList.remove('active'));
+                navLinks.forEach(link => link.classList.remove('active'));
 
-            if (pageId === 'profile') {
-                document.body.classList.add('showing-client-info');
-            } else {
-                document.body.classList.remove('showing-client-info');
+                const targetPage = document.getElementById(pageId + 'Page');
+                const targetLink = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+
+                if (targetPage && targetLink) {
+                    targetPage.classList.add('active');
+                    targetLink.classList.add('active');
+                }
+
+                // Fermer le menu mobile après la navigation
+                if (window.innerWidth <= 768) {
+                    menuToggle.classList.remove('active');
+                    document.querySelector('.nav-links').classList.remove('active');
+                }
             }
-        };
+
+            // Gestionnaire du menu hamburger
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+
+            // Fermer le menu au clic en dehors
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.navbar') && window.innerWidth <= 768) {
+                    menuToggle.classList.remove('active');
+                    document.querySelector('.nav-links').classList.remove('active');
+                }
+            });
+
+            // Mettre à jour la navigation au redimensionnement
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    menuToggle.classList.remove('active');
+                    document.querySelector('.nav-links').classList.remove('active');
+                }
+            });
+
+            // Exposer la fonction globalement
+            window.showPage = navigateToPage;
+        });
 
         // Update logout function
         window.logout = function() {
@@ -1172,24 +1261,6 @@
                 showPage('profile');
             }).catch((error) => console.error("Error logging out:", error));
         };
-
-        // Fonction pour le menu hamburger
-        window.toggleMenu = function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const navLinks = document.querySelector('.nav-links');
-            menuToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        };
-
-        // Fermer le menu quand un lien est cliqué
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                const menuToggle = document.querySelector('.menu-toggle');
-                const navLinks = document.querySelector('.nav-links');
-                menuToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-            });
-        });
     </script>
 </body>
 </html>
