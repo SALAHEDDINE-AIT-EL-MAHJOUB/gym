@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title data-i18n="title">Espace Client</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Mobile-First Styles */
         body {
@@ -159,6 +160,255 @@
         body[lang="ar"] td {
             text-align: right;
         }
+
+        /* New Styles for Client Info */
+        body {
+            background-color: #f9f9fa
+        }
+
+        .padding {
+            padding: 3rem !important
+        }
+
+        .user-card-full {
+            overflow: hidden;
+        }
+
+        .card {
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+            box-shadow: 0 1px 20px 0 rgba(69,90,100,0.08);
+            border: none;
+            margin-bottom: 30px;
+        }
+
+        .m-r-0 {
+            margin-right: 0px;
+        }
+
+        .m-l-0 {
+            margin-left: 0px;
+        }
+
+        .user-card-full .user-profile {
+            border-radius: 5px 0 0 5px;
+        }
+
+        .bg-c-lite-green {
+            background: -webkit-gradient(linear, left top, right top, from(#f29263), to(#ee5a6f));
+            background: linear-gradient(to right, #ee5a6f, #f29263);
+        }
+
+        .user-profile {
+            padding: 20px 0;
+        }
+
+        .card-block {
+            padding: 1.25rem;
+        }
+
+        .m-b-25 {
+            margin-bottom: 25px;
+        }
+
+        .img-radius {
+            border-radius: 5px;
+        }
+
+        h6 {
+            font-size: 14px;
+        }
+
+        .card .card-block p {
+            line-height: 25px;
+        }
+
+        @media only screen and (min-width: 1400px){
+            p {
+                font-size: 14px;
+            }
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: #2c3e50;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            background-color: #34495e;
+        }
+
+        .nav-links li a.active {
+            background-color: #3498db;
+        }
+
+        /* Page Visibility */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .nav-links li {
+                width: 100%;
+            }
+
+            .nav-links li a {
+                display: block;
+                text-align: center;
+                padding: 0.8rem;
+            }
+
+            .card {
+                margin: 10px 0;
+            }
+
+            .user-card-full .user-profile {
+                border-radius: 5px 5px 0 0;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                width: 100%;
+                border-radius: 5px 5px 0 0;
+            }
+
+            .col-sm-8 {
+                width: 100%;
+            }
+
+            .card-block {
+                padding: 1rem;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .col-sm-6 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            #calendar {
+                font-size: 0.7em;
+            }
+
+            #calendar th,
+            #calendar td {
+                padding: 4px;
+            }
+
+            #paymentTable {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                padding: 15px;
+            }
+
+            #languageSwitcher {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            #languageSwitcher button {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+
+            .page {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Tablet Responsive Styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .card {
+                margin: 15px;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+
+            .col-sm-4.bg-c-lite-green {
+                width: 40%;
+            }
+
+            .col-sm-8 {
+                width: 60%;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) {
+            .nav-links li a:hover {
+                background-color: transparent;
+            }
+
+            button:hover {
+                transform: none;
+            }
+
+            .nav-links li a:active {
+                background-color: #34495e;
+            }
+
+            button:active {
+                transform: scale(0.98);
+            }
+        }
     </style>
 </head>
 <body>
@@ -179,56 +429,123 @@
         <button onclick="login()" data-i18n="loginButton">Se Connecter</button>
     </div>
 
-    <div id="clientInfo" style="display:none;">
-        <h2 data-i18n="clientInfoTitle">Informations</h2>
-        <p><strong data-i18n="name">Nom:</strong> <span id="clientName"></span></p>
-        <p><strong data-i18n="nextPayment">Prochain Paiement le:</strong> <span id="nextPaymentDueDate"></span></p>
-    </div>
+    <div id="mainContent" style="display:none;">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li><a href="#" onclick="showPage('profile')" class="active">Profile</a></li>
+                <li><a href="#" onclick="showPage('calendar')">Calendrier</a></li>
+                <li><a href="#" onclick="showPage('payments')">Paiements</a></li>
+                <li><a href="#" onclick="logout()">Déconnexion</a></li>
+            </ul>
+        </nav>
 
-    <div id="calendarView" style="display:none;">
-        <h2 data-i18n="openingHoursTitle">Calendrier des Horaires d'Ouverture</h2>
-        <table id="calendar">
-            <thead>
-                <tr>
-                    <th data-i18n="monday">Lundi</th>
-                    <th data-i18n="tuesday">Mardi</th>
-                    <th data-i18n="wednesday">Mercredi</th>
-                    <th data-i18n="thursday">Jeudi</th>
-                    <th data-i18n="friday">Vendredi</th>
-                    <th data-i18n="saturday">Samedi</th>
-                    <th data-i18n="sunday">Dimanche</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td id="Monday"></td>
-                    <td id="Tuesday"></td>
-                    <td id="Wednesday"></td>
-                    <td id="Thursday"></td>
-                    <td id="Friday"></td>
-                    <td id="Saturday"></td>
-                    <td id="Sunday"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Profile Page -->
+        <div id="profilePage" class="page active">
+            <div id="clientInfo">
+                <div class="page-content page-container" id="page-content">
+                    <div class="padding">
+                        <div class="row container d-flex justify-content-center">
+                            <div class="col-xl-12 col-md-12">
+                                <div class="card user-card-full">
+                                    <div class="row m-l-0 m-r-0">
+                                        <div class="col-sm-4 bg-c-lite-green user-profile">
+                                            <div class="card-block text-center text-white">
+                                                <div class="m-b-25">
+                                                    <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
+                                                </div>
+                                                <h6 class="f-w-600" id="clientName"></h6>
+                                                <p>Membre Actif</p>
+                                                <i class="fas fa-edit m-t-40"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div class="card-block">
+                                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Information</h6>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Prochain Paiement</p>
+                                                        <h6 class="text-muted f-w-400" id="nextPaymentDueDate"></h6>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Tarif Mensuel</p>
+                                                        <h6 class="text-muted f-w-400" id="clientTariff"></h6>
+                                                    </div>
+                                                </div>
+                                                <h6 class="m-b-20 m-t-40 p-b-5 b-b-default f-w-600">Statut</h6>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">Jours Restants</p>
+                                                        <h6 class="text-muted f-w-400" id="daysRemaining"></h6>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <p class="m-b-10 f-w-600">État</p>
+                                                        <h6 class="text-muted f-w-400" id="clientStatus">Actif</h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div id="paymentHistory" style="display:none;">
-        <h2 data-i18n="paymentHistoryTitle">Historique des Paiements</h2>
-        <table id="paymentTable">
-            <thead>
-                <tr>
-                    <th data-i18n="date">Date</th>
-                    <th data-i18n="amount">Montant</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <!-- Calendar Page -->
+        <div id="calendarPage" class="page">
+            <div id="calendarView">
+                <h2 data-i18n="openingHoursTitle">Calendrier des Horaires d'Ouverture</h2>
+                <table id="calendar">
+                    <thead>
+                        <tr>
+                            <th data-i18n="monday">Lundi</th>
+                            <th data-i18n="tuesday">Mardi</th>
+                            <th data-i18n="wednesday">Mercredi</th>
+                            <th data-i18n="thursday">Jeudi</th>
+                            <th data-i18n="friday">Vendredi</th>
+                            <th data-i18n="saturday">Samedi</th>
+                            <th data-i18n="sunday">Dimanche</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="Monday"></td>
+                            <td id="Tuesday"></td>
+                            <td id="Wednesday"></td>
+                            <td id="Thursday"></td>
+                            <td id="Friday"></td>
+                            <td id="Saturday"></td>
+                            <td id="Sunday"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payments Page -->
+        <div id="paymentsPage" class="page">
+            <div id="paymentHistory">
+                <h2 data-i18n="paymentHistoryTitle">Historique des Paiements</h2>
+                <table id="paymentTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="date">Date</th>
+                            <th data-i18n="amount">Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -243,6 +560,27 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Set persistence to local (keeps the user logged in until they explicitly log out)
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                console.log("Persistence set to local.");
+                // Check if a user is already logged in
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        console.log(`User is logged in: ${user.email}`);
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('mainContent').style.display = 'block';
+                        showPage('profile'); // Show profile page by default
+                    } else {
+                        console.log("No user is logged in.");
+                        document.getElementById('loginForm').style.display = 'block';
+                        document.getElementById('mainContent').style.display = 'none';
+                    }
+                });
+            })
+            .catch((error) => console.error("Error setting persistence:", error));
 
         // Translations
         const translations = {
@@ -267,7 +605,9 @@
                 saturday: "Samedi",
                 sunday: "Dimanche",
                 closed: "Fermé",
-                notSet: "Non Défini"
+                notSet: "Non Défini",
+                tariff: "Tarif:",
+                daysRemaining: "Jours Restants:"
             },
             en: {
                 title: "Client Area",
@@ -290,7 +630,9 @@
                 saturday: "Saturday",
                 sunday: "Sunday",
                 closed: "Closed",
-                notSet: "Not Set"
+                notSet: "Not Set",
+                tariff: "Tariff:",
+                daysRemaining: "Days Remaining:"
             },
             ar: {
                 title: "منطقة العميل",
@@ -313,7 +655,9 @@
                 saturday: "السبت",
                 sunday: "الأحد",
                 closed: "مغلق",
-                notSet: "غير محدد"
+                notSet: "غير محدد",
+                tariff: "التعريفة:",
+                daysRemaining: "الأيام المتبقية:"
             }
         };
 
@@ -334,6 +678,7 @@
         // Set default language to French
         switchLanguage('fr');
 
+        // Login function
         window.login = function() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const cin = document.getElementById('cin').value;
@@ -357,9 +702,8 @@
                             displayPaymentHistory(clientFound);
                             displayOpeningHoursCalendar(openingHoursSnapshot.val()); // Pass opening hours data
                             document.getElementById('loginForm').style.display = 'none';
-                            document.getElementById('clientInfo').style.display = 'block';
-                            document.getElementById('paymentHistory').style.display = 'block';
-                            document.getElementById('calendarView').style.display = 'block';
+                            document.getElementById('mainContent').style.display = 'block';
+                            showPage('profile'); // Show profile page by default
                         } else {
                             alert("Incorrect phone number or CIN.");
                         }
@@ -374,6 +718,19 @@
 
         function displayClientInfo(client) {
             document.getElementById('clientName').textContent = `${client.firstName} ${client.lastName}`;
+
+            // Fetch the global tariff from the root level
+            const dbRef = ref(db);
+            get(dbRef)
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    const globalTariff = data.globalTariff;
+                    document.getElementById('clientTariff').textContent = `${globalTariff} MAD`;
+                })
+                .catch((error) => {
+                    console.error("Error fetching tariff:", error);
+                    document.getElementById('clientTariff').textContent = "N/A";
+                });
 
             // Calculate and display next payment due date
             const payments = client.payments || [];
@@ -396,6 +753,12 @@
             }
 
             document.getElementById('nextPaymentDueDate').textContent = nextPaymentDueDate.toLocaleDateString();
+
+            // Calculate and display days remaining
+            const today = new Date();
+            const timeDiff = nextPaymentDueDate - today;
+            const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            document.getElementById('daysRemaining').textContent = daysRemaining > 0 ? daysRemaining : "0";
         }
 
         function displayPaymentHistory(client) {
@@ -434,6 +797,31 @@
                 }
             });
         }
+
+        // Add new navigation function
+        window.showPage = function(pageId) {
+            // Remove active class from all pages and links
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page and highlight nav link
+            document.getElementById(pageId + 'Page').classList.add('active');
+            document.querySelector(`[onclick="showPage('${pageId}')"]`).classList.add('active');
+        };
+
+        // Update logout function
+        window.logout = function() {
+            signOut(auth).then(() => {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'none';
+                // Reset active page
+                showPage('profile');
+            }).catch((error) => console.error("Error logging out:", error));
+        };
     </script>
 </body>
 </html>
