@@ -689,6 +689,49 @@
                 font-size: 1rem;
             }
         }
+
+        /* Fix scrolling issues */
+        html, body {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .page-content.page-container {
+            min-height: auto;
+            height: auto;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .user-card-full {
+            min-height: auto;
+            height: auto;
+            overflow: visible;
+        }
+
+        .col-sm-4.bg-c-lite-green {
+            min-height: auto;
+            height: auto;
+        }
+
+        /* Remove overflow hidden */
+        body.showing-client-info {
+            overflow: auto;
+        }
+
+        @media (max-width: 768px) {
+            .page-content.page-container {
+                min-height: auto;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .card.user-card-full {
+                height: auto;
+                min-height: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -847,25 +890,36 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // Set persistence to local (keeps the user logged in until they explicitly log out)
-        setPersistence(auth, browserLocalPersistence)
-            .then(() => {
-                console.log("Persistence set to local.");
-                // Check if a user is already logged in
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        console.log(`User is logged in: ${user.email}`);
-                        document.getElementById('loginForm').style.display = 'none';
-                        document.getElementById('mainContent').style.display = 'block';
-                        showPage('profile'); // Show profile page by default
-                    } else {
-                        console.log("No user is logged in.");
-                        document.getElementById('loginForm').style.display = 'block';
-                        document.getElementById('mainContent').style.display = 'none';
-                    }
-                });
-            })
-            .catch((error) => console.error("Error setting persistence:", error));
+        // Add error handling for local environment
+        const isLocalEnvironment = window.location.protocol === 'file:';
+
+        // Modified auth persistence setup with error handling
+        if (!isLocalEnvironment) {
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                    console.log("Persistence set to local.");
+                    setupAuthStateListener();
+                })
+                .catch((error) => console.error("Error setting persistence:", error));
+        } else {
+            console.warn("Running in local environment - persistence disabled");
+            setupAuthStateListener();
+        }
+
+        function setupAuthStateListener() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    console.log(`User is logged in: ${user.email}`);
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    showPage('profile');
+                } else {
+                    console.log("No user is logged in.");
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('mainContent').style.display = 'none';
+                }
+            });
+        }
 
         // Translations
         const translations = {
@@ -963,42 +1017,47 @@
         // Set default language to French
         switchLanguage('fr');
 
-        // Login function
-        window.login = function() {
+        // Modified login function
+        window.login = async function() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const cin = document.getElementById('cin').value;
 
-            const clientsRef = ref(db, 'clients');
-            const openingHoursRef = ref(db, 'openingHours');
+            try {
+                const clientsRef = ref(db, 'clients');
+                const openingHoursRef = ref(db, 'openingHours');
 
-            Promise.all([get(clientsRef), get(openingHoursRef)])
-                .then(([clientsSnapshot, openingHoursSnapshot]) => {
-                    if (clientsSnapshot.exists()) {
-                        let clientFound = null;
-                        clientsSnapshot.forEach(childSnapshot => {
-                            const client = childSnapshot.val();
-                            if (client.phoneNumber === phoneNumber && client.cin === cin) {
-                                clientFound = { ...client, key: childSnapshot.key };
-                            }
-                        });
+                const [clientsSnapshot, openingHoursSnapshot] = await Promise.all([
+                    get(clientsRef),
+                    get(openingHoursRef)
+                ]);
 
-                        if (clientFound) {
-                            displayClientInfo(clientFound);
-                            displayPaymentHistory(clientFound);
-                            displayOpeningHoursCalendar(openingHoursSnapshot.val()); // Pass opening hours data
-                            document.getElementById('loginForm').style.display = 'none';
-                            document.getElementById('mainContent').style.display = 'block';
-                            showPage('profile'); // Show profile page by default
-                        } else {
-                            alert("Incorrect phone number or CIN.");
-                        }
-                    } else {
-                        console.log("No data available");
-                        alert("No client found.");
+                if (!clientsSnapshot.exists()) {
+                    throw new Error("No clients found");
+                }
+
+                let clientFound = null;
+                clientsSnapshot.forEach(childSnapshot => {
+                    const client = childSnapshot.val();
+                    if (client.phoneNumber === phoneNumber && client.cin === cin) {
+                        clientFound = { ...client, key: childSnapshot.key };
                     }
-                }).catch((error) => {
-                    console.error(error);
                 });
+
+                if (clientFound) {
+                    // Success - show main content
+                    displayClientInfo(clientFound);
+                    displayPaymentHistory(clientFound);
+                    displayOpeningHoursCalendar(openingHoursSnapshot.val());
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    showPage('profile');
+                } else {
+                    alert("Invalid credentials");
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                alert("Error during login. Please try again.");
+            }
         };
 
         function displayClientInfo(client) {
