@@ -162,46 +162,53 @@
         };
 
         // Function to open the add payment modal
-        window.openAddPaymentModal = function(clientId) {
+        window.openAddPaymentModal = async function(clientId) {
             const modal = document.getElementById('addPaymentModal');
-            modal.style.display = 'block';
-            modal.dataset.clientId = clientId; // Store the client ID in the modal
+            const paymentAmount = document.getElementById('paymentAmount');
+            const errorElement = document.getElementById('paymentError');
 
-            // Set the default payment date to one month after the last payment
+            // Récupérer et définir automatiquement le tarif global
+            try {
+                const dbRef = ref(db);
+                const snapshot = await get(dbRef);
+                const globalTariff = snapshot.val().globalTariff;
+                paymentAmount.value = globalTariff;
+                paymentAmount.readOnly = true; // Rendre le champ en lecture seule
+                errorElement.textContent = "";
+            } catch (error) {
+                console.error('Error getting global tariff:', error);
+            }
+
+            modal.style.display = 'block';
+            modal.dataset.clientId = clientId;
+            
+            // Calculer la date du prochain paiement
             const clientRef = ref(db, `clients/${clientId}`);
-            get(clientRef).then((snapshot) => {
+            try {
+                const snapshot = await get(clientRef);
                 if (snapshot.exists()) {
                     const client = snapshot.val();
                     const payments = client.payments || [];
-                    const paymentFrequency = client.paymentFrequency || "monthly";
-
-                    let nextValidPaymentDate;
-
+                    
+                    let nextPaymentDate;
                     if (payments.length > 0) {
                         const lastPayment = payments[payments.length - 1];
                         const lastPaymentDate = new Date(lastPayment.date);
-
-                        nextValidPaymentDate = new Date(lastPaymentDate);
-                        if (paymentFrequency === "monthly") {
-                            nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
-                        } else if (paymentFrequency === "annual") {
-                            nextValidPaymentDate.setFullYear(nextValidPaymentDate.getFullYear() + 1);
-                        }
+                        nextPaymentDate = new Date(lastPaymentDate);
+                        nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
                     } else {
-                        // If no payments exist, set the next payment date to one month from today
-                        nextValidPaymentDate = new Date();
-                        nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
+                        nextPaymentDate = new Date();
                     }
 
-                    // Format the date as YYYY-MM-DD for the input field
-                    const year = nextValidPaymentDate.getFullYear();
-                    const month = String(nextValidPaymentDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(nextValidPaymentDate.getDate()).padStart(2, '0');
-                    const formattedDate = `${year}-${month}-${day}`;
-
-                    document.getElementById('newPaymentDate').value = formattedDate;
+                    // Formater la date pour l'input
+                    const year = nextPaymentDate.getFullYear();
+                    const month = String(nextPaymentDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(nextPaymentDate.getDate()).padStart(2, '0');
+                    document.getElementById('newPaymentDate').value = `${year}-${month}-${day}`;
                 }
-            });
+            } catch (error) {
+                console.error('Error calculating next payment date:', error);
+            }
         };
 
         // Function to close the add payment modal
@@ -210,65 +217,69 @@
             modal.style.display = 'none';
         };
 
-        // Function to add a payment
-        window.addPayment = function() {
+        // Remplacer la fonction addPayment existante
+        window.addPayment = async function() {
             const clientId = document.getElementById('addPaymentModal').dataset.clientId;
             const newPaymentDate = document.getElementById('newPaymentDate').value;
             const paymentAmountInput = document.getElementById('paymentAmount').value;
             const paymentAmount = parseFloat(paymentAmountInput);
+            const errorElement = document.getElementById('paymentError');
 
-            if (isNaN(paymentAmount) || paymentAmount <= 0) {
-                document.getElementById('paymentError').textContent = "Invalid payment amount. Please enter a valid number greater than 0.";
-                return;
-            } else {
-                document.getElementById('paymentError').textContent = "";
-            }
+            // Vérifier si le montant est égal au tarif global
+            const dbRef = ref(db);
+            try {
+                const snapshot = await get(dbRef);
+                const globalTariff = snapshot.val().globalTariff;
 
-            const clientRef = ref(db, `clients/${clientId}`);
-            get(clientRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const client = snapshot.val();
+                if (paymentAmount !== globalTariff) {
+                    errorElement.textContent = `Le montant doit être égal au tarif global (${globalTariff} MAD)`;
+                    return;
+                }
+
+                // Vérifier que le montant n'est pas un nombre impair
+                if (paymentAmount % 2 !== 0) {
+                    errorElement.textContent = "Le montant doit être un nombre pair";
+                    return;
+                }
+
+                const clientRef = ref(db, `clients/${clientId}`);
+                const clientSnapshot = await get(clientRef);
+                
+                if (clientSnapshot.exists()) {
+                    const client = clientSnapshot.val();
                     const payments = client.payments || [];
-                    const paymentFrequency = client.paymentFrequency || "monthly";
-
-                    // Calculate next valid payment date
-                    let nextValidPaymentDate;
                     
+                    // Vérifier l'intervalle entre les paiements
                     if (payments.length > 0) {
                         const lastPayment = payments[payments.length - 1];
                         const lastPaymentDate = new Date(lastPayment.date);
-                        nextValidPaymentDate = new Date(lastPaymentDate);
-                        
-                        if (paymentFrequency === "monthly") {
-                            nextValidPaymentDate.setMonth(nextValidPaymentDate.getMonth() + 1);
-                        } else if (paymentFrequency === "annual") {
-                            nextValidPaymentDate.setFullYear(nextValidPaymentDate.getFullYear() + 1);
+                        const newPaymentDateObj = new Date(newPaymentDate);
+                        const monthsDiff = (newPaymentDateObj.getMonth() + 12 * newPaymentDateObj.getFullYear()) - 
+                                        (lastPaymentDate.getMonth() + 12 * lastPaymentDate.getFullYear());
+
+                        // Vérifier si le paiement est exactement pour le mois suivant
+                        if (monthsDiff !== 1) {
+                            errorElement.textContent = "Le paiement doit être effectué pour le mois suivant";
+                            return;
                         }
-                    } else {
-                        // If no previous payments, use current date
-                        nextValidPaymentDate = new Date();
                     }
 
-                    const newPaymentDateObj = new Date(newPaymentDate);
+                    // Si toutes les validations sont passées, ajouter le paiement
+                    payments.push({ 
+                        date: newPaymentDate, 
+                        amount: paymentAmount 
+                    });
 
-                    // Validate payment date
-                    if (!payments.length || newPaymentDateObj >= nextValidPaymentDate) {
-                        payments.push({ date: newPaymentDate, amount: paymentAmount });
-                        
-                        // Update the client with the new payment
-                        update(clientRef, { payments: payments })
-                            .then(() => {
-                                console.log('Payment added successfully!');
-                                closeAddPaymentModal();
-                            })
-                            .catch((error) => console.error('Error adding payment:', error));
-                    } else {
-                        document.getElementById('paymentError').textContent = `Payment date must be on or after ${nextValidPaymentDate.toLocaleDateString()}`;
-                    }
+                    // Mettre à jour la base de données
+                    await update(clientRef, { payments: payments });
+                    closeAddPaymentModal();
+                    errorElement.textContent = "";
+
                 }
-            }).catch((error) => {
-                console.error(error);
-            });
+            } catch (error) {
+                console.error('Error adding payment:', error);
+                errorElement.textContent = "Une erreur est survenue lors du paiement";
+            }
         };
 
         // Function to open the edit client modal
